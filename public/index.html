@@ -1,370 +1,427 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <title>韩国股市客户持仓跟踪与止盈止损预警</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <title>韩国股票客户持仓追踪</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    :root {
-      --bg: #f3f4f6;
-      --card-bg: #ffffff;
-      --border: #e5e7eb;
-      --primary: #2563eb;
-      --primary-soft: #e0edff;
-      --danger: #ef4444;
-      --text-main: #111827;
-      --text-sub: #6b7280;
-      --gain: #16a34a;
-      --loss: #dc2626;
-      --radius-lg: 16px;
-      --radius-md: 10px;
-    }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      padding: 20px;
-      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
-        "Helvetica Neue",Arial,"Noto Sans CJK SC","Malgun Gothic",sans-serif;
-      background: radial-gradient(circle at top,#e5edff,#f9fafb 55%,#f3f4f6);
-      color: var(--text-main);
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
     }
-    .container { max-width: 1180px; margin: 0 auto; }
-    header { margin-bottom: 16px; }
-    header h1 {
-      margin: 0;
-      font-size: 24px;
+    a { color: #38bdf8; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .layout {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
+      margin-bottom: 16px;
     }
-    header h1 span {
-      font-size: 11px;
-      padding: 2px 8px;
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f9fafb;
+    }
+    .subtitle {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
       border-radius: 999px;
-      background: var(--primary-soft);
-      color: var(--primary);
+      font-size: 11px;
+      background: #0b1120;
+      border: 1px solid #1f2937;
+      color: #9ca3af;
+      gap: 4px;
     }
-    header p {
-      margin: 6px 0 0;
-      font-size: 13px;
-      color: var(--text-sub);
-    }
-    .layout {
+
+    .grid {
       display: grid;
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: 320px 1fr;
       gap: 16px;
     }
     @media (max-width: 900px) {
-      .layout { grid-template-columns: 1fr; }
+      .grid {
+        grid-template-columns: 1fr;
+      }
     }
+
     .card {
-      background: var(--card-bg);
-      border-radius: var(--radius-lg);
-      border: 1px solid rgba(148,163,184,0.35);
-      box-shadow: 0 18px 36px rgba(15,23,42,0.08);
-      padding: 16px 18px;
+      background: radial-gradient(circle at top left,#1e293b 0,#020617 55%);
+      border-radius: 14px;
+      border: 1px solid #1f2937;
+      padding: 14px 16px;
+      box-shadow: 0 18px 40px rgba(15,23,42,0.7);
     }
     .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #e5e7eb;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 4px;
     }
-    .card-subtitle {
-      font-size: 12px;
-      color: var(--text-sub);
-      margin-bottom: 10px;
+    .card-title span {
+      font-size: 11px;
+      color: #9ca3af;
+      font-weight: 400;
     }
-    form { display: grid; gap: 8px; }
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-    .form-row-3 {
-      display: grid;
-      grid-template-columns: repeat(3,minmax(0,1fr));
-      gap: 8px;
-    }
-    @media (max-width: 520px) {
-      .form-row, .form-row-3 { grid-template-columns: 1fr; }
-    }
+
     label {
       display: block;
-      font-size: 11px;
-      color: var(--text-sub);
-      margin-bottom: 2px;
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 4px;
     }
-    input[type="text"], input[type="number"] {
+    input, select {
       width: 100%;
-      padding: 7px 8px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
+      border-radius: 9px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: #e5e7eb;
       font-size: 13px;
-      background: #f9fafb;
+      padding: 7px 10px;
       outline: none;
     }
-    input:focus {
-      border-color: var(--primary);
-      background: #ffffff;
-      box-shadow: 0 0 0 1px rgba(37,99,235,0.15);
+    input:focus, select:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px #38bdf8;
     }
-    .help-text {
-      font-size: 11px;
-      color: var(--text-sub);
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2,minmax(0,1fr));
+      gap: 8px;
     }
-    .btn-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 4px;
-    }
-    button {
-      border: none;
+
+    .btn {
       border-radius: 999px;
+      border: none;
       padding: 7px 14px;
-      font-size: 12px;
+      font-size: 13px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 4px;
-      white-space: nowrap;
     }
     .btn-primary {
-      background: linear-gradient(135deg,#2563eb,#1d4ed8);
-      color: #ffffff;
-      font-weight: 500;
-      box-shadow: 0 10px 24px rgba(37,99,235,0.35);
+      background: linear-gradient(135deg,#22c55e,#16a34a);
+      color: #ecfdf5;
     }
-    .btn-secondary { background: #e5e7eb; color: #374151; }
-    .btn-ghost { background: transparent; color: var(--text-sub); padding-inline: 8px; }
-    .btn-danger-outline {
-      background: #fef2f2;
-      color: var(--danger);
-      border: 1px solid #fecaca;
+    .btn-primary:hover { filter: brightness(1.05); }
+    .btn-secondary {
+      background: #0b1120;
+      color: #e5e7eb;
+      border: 1px solid #1f2937;
     }
-    button:active { transform: translateY(1px); box-shadow: none; }
+    .btn-secondary:hover { border-color: #4b5563; }
+    .btn-ghost {
+      background: transparent;
+      color: #9ca3af;
+      border: 1px solid #1f2937;
+    }
+    .btn-ghost:hover { border-color: #6b7280; }
+    .btn-danger {
+      background: #7f1d1d;
+      color: #fee2e2;
+    }
 
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(4,1fr);
-      gap: 10px;
+    .btn-sm { padding: 4px 10px; font-size: 11px; }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
     }
-    @media (max-width: 780px) {
-      .summary-grid { grid-template-columns: repeat(2,1fr); }
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #9ca3af;
+    }
+    .switch input {
+      width: auto;
+      height: auto;
+      cursor: pointer;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3,minmax(0,1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 900px) {
+      .summary {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+      }
     }
     .summary-item {
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-      padding: 8px 10px;
-      background: linear-gradient(145deg,#ffffff,#f7f8fc);
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: #020617;
+      border: 1px solid #1f2937;
     }
-    .summary-label { font-size: 11px; color: var(--text-sub); margin-bottom: 3px; }
-    .summary-value { font-size: 14px; font-weight: 600; }
-    .summary-value.gain { color: var(--gain); }
-    .summary-value.loss { color: var(--loss); }
-    .summary-footer {
-      margin-top: 6px;
+    .summary-label {
       font-size: 11px;
-      color: var(--text-sub);
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
+      color: #9ca3af;
+      margin-bottom: 4px;
     }
+    .summary-value {
+      font-size: 14px;
+    }
+    .summary-value.positive { color: #22c55e; }
+    .summary-value.negative { color: #ef4444; }
 
-    .table-wrapper {
-      margin-top: 10px;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      background: #ffffff;
-      overflow: hidden;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
     }
-    table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    thead { background: #f3f4f6; }
+    thead {
+      background: #020617;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
     th, td {
-      padding: 7px 9px;
-      border-bottom: 1px solid #e5e7eb;
+      padding: 6px 8px;
+      border-bottom: 1px solid #111827;
       text-align: right;
       white-space: nowrap;
     }
-    th { font-size: 11px; font-weight: 600; color: #4b5563; }
-    td { color: #111827; }
-    th.t-left, td.t-left { text-align: left; }
-    tbody tr:nth-child(even) { background: #fafafa; }
+    th {
+      font-weight: 500;
+      color: #9ca3af;
+    }
+    td.t-left, th.t-left { text-align: left; }
 
-    tr.alert-loss { background: #fef2f2 !important; }
-    tr.alert-profit { background: #ecfdf3 !important; }
+    tbody tr:hover {
+      background: rgba(15,23,42,0.7);
+    }
+
+    .group-row td {
+      background: #020617;
+      border-bottom-color: #1f2937;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
 
     .pill {
+      padding: 0 8px;
+      border-radius: 999px;
+      font-size: 11px;
       display: inline-flex;
-      padding: 2px 7px;
+      align-items: center;
+      justify-content: center;
+    }
+    .pill-gain { background: rgba(22,163,74,0.15); color: #4ade80; }
+    .pill-loss { background: rgba(220,38,38,0.15); color: #fca5a5; }
+    .pill-neutral { background: #020617; color: #9ca3af; }
+
+    .tag-alert {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
       border-radius: 999px;
       font-size: 10px;
+      background: rgba(248,250,252,0.06);
+      border: 1px solid rgba(148,163,184,0.6);
+      color: #e5e7eb;
     }
-    .pill-gain { background: #dcfce7; color: #15803d; }
-    .pill-loss { background: #fee2e2; color: #b91c1c; }
-    .pill-neutral { background: #e5e7eb; color: #4b5563; }
 
-    .actions { display: flex; justify-content: flex-end; gap: 4px; }
-    .actions button { padding: 4px 8px; font-size: 11px; }
+    .row-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: nowrap;
+    }
 
     .empty-tip {
-      text-align: center;
       font-size: 12px;
-      color: var(--text-sub);
-      padding: 30px 10px;
+      color: #6b7280;
+      padding: 16px 0;
+      text-align: center;
     }
-    .footer-note {
-      margin-top: 8px;
-      font-size: 11px;
-      color: var(--text-sub);
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0 6px;
+      border-radius: 999px;
+      font-size: 10px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: #9ca3af;
     }
-    .powered {
-      margin-top: 18px;
-      font-size: 11px;
-      color: var(--text-sub);
+
+    .footer {
+      margin-top: 16px;
+      font-size: 10px;
+      color: #4b5563;
       text-align: right;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>
-        韩国股市客户持仓实时跟踪
-        <span>KOSPI / KOSDAQ 止盈止损预警</span>
-      </h1>
-      <p>客户把持仓发给你，你统一登记；系统按韩国实时行情自动对比止盈/止损，提醒你操作。</p>
+  <div class="layout">
+    <header class="header">
+      <div>
+        <div class="title">韩国股票客户持仓追踪</div>
+        <div class="subtitle">
+          客户按姓名分组管理，实时对比买入成本与市值，自动刷新行情，支持导出每日收益日报（本地浏览器存储，安全可控）。
+        </div>
+      </div>
+      <div>
+        <span class="tag">
+          <span>시장</span>
+          <strong>KOSPI / KOSDAQ</strong>
+        </span>
+      </div>
     </header>
 
-    <div class="layout">
-      <!-- 左侧：录入表单 -->
+    <main class="grid">
+      <!-- 左侧：新增 / 编辑持仓 -->
       <section class="card">
         <div class="card-title">
-          <span>新增 / 修改持仓</span>
-          <span style="font-size:10px;color:var(--text-sub);">只对你自己可见，客户彼此看不到</span>
-        </div>
-        <div class="card-subtitle">
-          symbol 填韩国行情用的代码：KOSPI = 代码 + .KS（005930.KS），KOSDAQ = 代码 + .KQ（091990.KQ）。
+          新增 / 修改持仓
+          <span>Symbol 示例：005930.KS（KOSPI）、353200.KQ（KOSDAQ）</span>
         </div>
 
-        <form id="holding-form">
-          <input type="hidden" id="editingId" />
+        <form id="holdForm">
+          <input type="hidden" id="editId" />
 
-          <div class="form-row">
+          <label>客户姓名 / 分组名</label>
+          <input id="client" placeholder="例如：张三 / 悟空组" required />
+
+          <label style="margin-top:8px;">股票名称</label>
+          <input id="stockName" placeholder="例如：삼성전자 / 박셀바이오" required />
+
+          <label style="margin-top:8px;">证券代码（可带 .KS / .KQ）</label>
+          <input id="symbol" placeholder="例如：005930.KS / 323990.KQ" required />
+
+          <div class="row" style="margin-top:8px;">
             <div>
-              <label for="client">客户姓名 / 昵称</label>
-              <input id="client" type="text" placeholder="例如：张三 / 김철수" required />
+              <label>持股数量（股）</label>
+              <input id="quantity" type="number" min="1" step="1" required />
             </div>
             <div>
-              <label for="stockName">股票名称</label>
-              <input id="stockName" type="text" placeholder="例如：삼성전자" required />
+              <label>买入价格（₩）</label>
+              <input id="cost" type="number" min="0" step="1" required />
             </div>
           </div>
 
-          <div class="form-row">
+          <div class="row" style="margin-top:8px;">
             <div>
-              <label for="symbol">股票代码（用于韩国行情）</label>
-              <input id="symbol" type="text"
-                     placeholder="例如：005930.KS（三星전자）、000660.KS（SK하이닉스）"
-                     required />
+              <label>止损价（选填）</label>
+              <input id="stopLoss" type="number" min="0" step="1" />
             </div>
             <div>
-              <label for="quantity">持股数量</label>
-              <input id="quantity" type="number" min="1" step="1" placeholder="100" required />
+              <label>止盈价（选填）</label>
+              <input id="takeProfit" type="number" min="0" step="1" />
             </div>
           </div>
 
-          <div class="form-row-3">
-            <div>
-              <label for="cost">买入均价（韩元）</label>
-              <input id="cost" type="number" min="0" step="0.01" placeholder="72000" required />
-            </div>
-            <div>
-              <label for="stopLoss">止损价（韩元，可选）</label>
-              <input id="stopLoss" type="number" min="0" step="0.01" placeholder="例如：67000" />
-            </div>
-            <div>
-              <label for="takeProfit">止盈价（韩元，可选）</label>
-              <input id="takeProfit" type="number" min="0" step="0.01" placeholder="例如：82000" />
+          <div style="margin-top:10px; display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap;">
+            <button type="submit" class="btn btn-primary">
+              <span id="submitLabel">保存持仓</span>
+            </button>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button type="button" id="resetBtn" class="btn btn-secondary btn-sm">清空表单</button>
+              <button type="button" id="clearAllBtn" class="btn btn-danger btn-sm">清空所有持仓（本机）</button>
             </div>
           </div>
 
-          <div class="help-text">
-            初始当前价使用成本价；行情 key 配好后，可以用「手动刷新」或「自动刷新」同步韩国实时价格。
-          </div>
-
-          <div class="btn-row">
-            <button type="submit" class="btn-primary" id="submitBtn">保存持仓</button>
-            <button type="button" class="btn-secondary" id="resetFormBtn">清空表单</button>
-            <button type="button" class="btn-ghost" id="clearAllBtn">清空全部持仓（本机）</button>
+          <div style="margin-top:8px; font-size:11px; color:#6b7280;">
+            数据保存在浏览器 <span class="badge">localStorage</span> 中，只在本机可见。<br/>
+            如需多台设备同步，可以后升级为云端版。
           </div>
         </form>
-
-        <div class="footer-note">
-          <span>数据只保存在你这台电脑浏览器的 localStorage 中，示例版不会上传服务器。</span>
-          <span>以后要多人共用，可以再接数据库 + 登录系统。</span>
-        </div>
       </section>
 
-      <!-- 右侧：汇总 + 表格 -->
-      <section>
-        <div class="card">
-          <div class="card-title">
-            <span>持仓概览 & 刷新设置</span>
-            <div style="display:flex;gap:6px;align-items:center;">
-              <button type="button" class="btn-secondary" id="refreshBtn">🔄 手动刷新行情</button>
-              <button type="button" class="btn-ghost" id="toggleAutoBtn">⏱ 开启自动刷新</button>
-            </div>
-          </div>
-          <div class="card-subtitle">
-            自动刷新会定时调用 Twelve Data 韩国行情 API，提醒只在页面打开时有效。
-          </div>
+      <!-- 右侧：汇总 + 明细 -->
+      <section class="card">
+        <div class="card-title">
+          持仓概览 · 实时报价
+          <span>
+            <span class="tag-alert">自动刷新 + 止盈/止损颜色提示</span>
+          </span>
+        </div>
 
-          <div class="summary-grid">
-            <div class="summary-item">
-              <div class="summary-label">总投入成本</div>
-              <div class="summary-value" id="totalCost">₩ 0</div>
+        <div class="toolbar">
+          <div class="toolbar-right">
+            <button type="button" id="refreshBtn" class="btn btn-secondary btn-sm">🔄 手动刷新行情</button>
+            <div class="switch">
+              <input type="checkbox" id="autoRefreshToggle" />
+              <label for="autoRefreshToggle" style="margin:0;">自动刷新</label>
             </div>
-            <div class="summary-item">
-              <div class="summary-label">当前总市值</div>
-              <div class="summary-value" id="totalValue">₩ 0</div>
-            </div>
-            <div class="summary-item">
-              <div class="summary-label">总浮动盈亏</div>
-              <div class="summary-value" id="totalPnl">₩ 0</div>
-            </div>
-            <div class="summary-item">
-              <div class="summary-label">整体收益率</div>
-              <div class="summary-value" id="totalReturn">0.00%</div>
-            </div>
+            <select id="intervalSelect" style="width:auto;">
+              <option value="30">30秒</option>
+              <option value="60" selected>60秒</option>
+              <option value="120">120秒</option>
+            </select>
           </div>
-
-          <div class="summary-footer">
-            <span id="positionCount">当前持仓：0 条记录</span>
-            <span id="lastUpdate">最近行情更新时间：—</span>
+          <div class="toolbar-right">
+            <button type="button" id="exportBtn" class="btn btn-ghost btn-sm">📤 导出收益日报（CSV）</button>
           </div>
         </div>
 
-        <div class="table-wrapper card" style="padding:0;margin-top:10px;">
+        <div class="summary">
+          <div class="summary-item">
+            <div class="summary-label">总投入成本</div>
+            <div class="summary-value" id="sumCost">₩ 0</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">当前市值</div>
+            <div class="summary-value" id="sumValue">₩ 0</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">总盈亏 / 收益率</div>
+            <div class="summary-value" id="sumPnl">₩ 0（0.00%）</div>
+          </div>
+        </div>
+
+        <div style="max-height:420px; overflow:auto; border-radius:10px; border:1px solid #0f172a;">
           <table>
             <thead>
               <tr>
                 <th class="t-left">客户</th>
                 <th class="t-left">股票</th>
-                <th>Symbol</th>
+                <th>代码</th>
                 <th>数量</th>
-                <th>成本</th>
+                <th>成本价</th>
                 <th>止损</th>
                 <th>止盈</th>
-                <th>当前价</th>
+                <th>现价</th>
                 <th>市值</th>
                 <th>盈亏</th>
                 <th>收益率</th>
@@ -373,27 +430,26 @@
             </thead>
             <tbody id="tableBody"></tbody>
           </table>
-          <div id="emptyTip" class="empty-tip">
-            还没有登记任何持仓，可以先在左侧录入一笔客户持仓试试。
-          </div>
+        </div>
+
+        <div id="emptyTip" class="empty-tip" style="display:none;">
+          还没有录入任何持仓记录，请在左侧填写客户与股票信息后点击“保存持仓”。
+        </div>
+
+        <div class="footer">
+          Data by Naver Finance · 每位用户数据仅保存在本机浏览器中。
         </div>
       </section>
-    </div>
-
-    <div class="powered">
-      Data provided by Twelve Data · 专用于韩国 KOSPI / KOSDAQ
-    </div>
+    </main>
   </div>
 
-  <!-- 提醒声音，可自己换 mp3 文件放在 public 目录 -->
-  <audio id="alertSound" src="alert.mp3" preload="auto"></audio>
-
   <script>
-    const STORAGE_KEY = "client_portfolio_with_alerts_korea_v1";
-    const API_BASE = ""; // 和 server.js 同域部署留空；如果前端单独托管，就写后端地址
+    // ==== 本地存储键 ====
+    const STORAGE_KEY = "korea_portfolio_tracker_v1";
 
-    const form = document.getElementById("holding-form");
-    const editingIdInput = document.getElementById("editingId");
+    // ==== DOM ====
+    const form = document.getElementById("holdForm");
+    const editIdInput = document.getElementById("editId");
     const clientInput = document.getElementById("client");
     const stockNameInput = document.getElementById("stockName");
     const symbolInput = document.getElementById("symbol");
@@ -401,91 +457,80 @@
     const costInput = document.getElementById("cost");
     const stopLossInput = document.getElementById("stopLoss");
     const takeProfitInput = document.getElementById("takeProfit");
-
-    const submitBtn = document.getElementById("submitBtn");
-    const resetFormBtn = document.getElementById("resetFormBtn");
+    const resetBtn = document.getElementById("resetBtn");
     const clearAllBtn = document.getElementById("clearAllBtn");
     const refreshBtn = document.getElementById("refreshBtn");
-    const toggleAutoBtn = document.getElementById("toggleAutoBtn");
-
+    const autoToggle = document.getElementById("autoRefreshToggle");
+    const intervalSelect = document.getElementById("intervalSelect");
+    const exportBtn = document.getElementById("exportBtn");
     const tableBody = document.getElementById("tableBody");
     const emptyTip = document.getElementById("emptyTip");
-
-    const totalCostEl = document.getElementById("totalCost");
-    const totalValueEl = document.getElementById("totalValue");
-    const totalPnlEl = document.getElementById("totalPnl");
-    const totalReturnEl = document.getElementById("totalReturn");
-    const positionCountEl = document.getElementById("positionCount");
-    const lastUpdateEl = document.getElementById("lastUpdate");
-
-    const alertSound = document.getElementById("alertSound");
+    const sumCostEl = document.getElementById("sumCost");
+    const sumValueEl = document.getElementById("sumValue");
+    const sumPnlEl = document.getElementById("sumPnl");
+    const submitLabel = document.getElementById("submitLabel");
 
     let holdings = [];
     let autoTimer = null;
-    let autoOn = false;
-    const AUTO_INTERVAL_MS = 60 * 1000; // 自动刷新间隔 60 秒
 
-    function loadHoldingsFromStorage() {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return [];
+    function loadHoldings() {
       try {
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
+        const raw = localStorage.getItem(STORAGE_KEY);
+        holdings = raw ? JSON.parse(raw) : [];
       } catch (e) {
-        console.error("解析本地数据失败", e);
-        return [];
+        holdings = [];
       }
     }
 
-    function saveHoldingsToStorage() {
+    function saveHoldings() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(holdings));
+      renderAll();
     }
 
-    function generateId() {
-      return "h_" + Date.now() + "_" + Math.random().toString(16).slice(2);
-    }
-
-    function formatCurrencyKRW(v) {
-      if (isNaN(v)) return "₩ 0";
-      return "₩ " + Number(v).toLocaleString("ko-KR", { maximumFractionDigits: 0 });
+    function formatNumber(n) {
+      return n.toLocaleString("ko-KR");
     }
 
     function formatPercent(v) {
-      if (isNaN(v)) return "0.00%";
-      return v.toFixed(2) + "%";
+      const n = Number(v);
+      if (!isFinite(n)) return "0.00%";
+      const s = n.toFixed(2) + "%";
+      if (n > 0) return "+" + s;
+      return s;
     }
 
-    function formatDateTime(str) {
-      if (!str) return "—";
-      const d = new Date(str);
-      if (Number.isNaN(d.getTime())) return "—";
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, "0");
-      const dd = String(d.getDate()).padStart(2, "0");
-      const hh = String(d.getHours()).padStart(2, "0");
-      const mi = String(d.getMinutes()).padStart(2, "0");
-      return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
-    }
-
-    async function api(url, options = {}) {
-      const res = await fetch(API_BASE + url, {
-        headers: { "Content-Type": "application/json" },
-        ...options
+    function groupByClient(list) {
+      const map = {};
+      list.forEach(h => {
+        const key = h.client || "未命名客户";
+        if (!map[key]) map[key] = [];
+        map[key].push(h);
       });
-      if (!res.ok) {
-        let msg = "请求失败";
-        try {
-          const data = await res.json();
-          msg = data.error || JSON.stringify(data);
-        } catch (e) {}
-        throw new Error(msg);
-      }
-      return res.json();
+      return map;
     }
 
-    function render() {
-      renderTable();
-      renderSummary();
+    function renderSummary() {
+      let totalCost = 0;
+      let totalValue = 0;
+
+      holdings.forEach(h => {
+        const qty = Number(h.quantity) || 0;
+        const cost = Number(h.cost) || 0;
+        const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
+        totalCost += qty * cost;
+        totalValue += qty * cur;
+      });
+
+      const pnl = totalValue - totalCost;
+      const rate = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
+
+      sumCostEl.textContent = "₩ " + formatNumber(totalCost);
+      sumValueEl.textContent = "₩ " + formatNumber(totalValue);
+
+      sumPnlEl.textContent = `₩ ${formatNumber(pnl)}（${formatPercent(rate)}）`;
+      sumPnlEl.classList.remove("positive","negative");
+      if (pnl > 0) sumPnlEl.classList.add("positive");
+      else if (pnl < 0) sumPnlEl.classList.add("negative");
     }
 
     function renderTable() {
@@ -496,148 +541,160 @@
       }
       emptyTip.style.display = "none";
 
-      holdings.forEach((h) => {
-        const cost = h.quantity * h.cost;
-        const value = h.quantity * (h.currentPrice ?? h.cost);
-        const pnl = value - cost;
-        const rate = cost > 0 ? (pnl / cost) * 100 : 0;
+      const groups = groupByClient(holdings);
+      const clients = Object.keys(groups).sort();
 
-        const tr = document.createElement("tr");
+      clients.forEach(clientName => {
+        const list = groups[clientName];
 
-        // 预警着色
-        if (h.currentPrice != null) {
-          if (h.stopLoss && h.currentPrice <= h.stopLoss) {
-            tr.classList.add("alert-loss");
-          } else if (h.takeProfit && h.currentPrice >= h.takeProfit) {
-            tr.classList.add("alert-profit");
+        let clientCost = 0;
+        let clientValue = 0;
+        list.forEach(h => {
+          const qty = Number(h.quantity) || 0;
+          const cost = Number(h.cost) || 0;
+          const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
+          clientCost += qty * cost;
+          clientValue += qty * cur;
+        });
+        const clientPnl = clientValue - clientCost;
+        const clientRate = clientCost > 0 ? (clientPnl / clientCost) * 100 : 0;
+
+        // 分组行
+        const gtr = document.createElement("tr");
+        gtr.className = "group-row";
+        const gtd = document.createElement("td");
+        gtd.colSpan = 12;
+        gtd.className = "t-left";
+        gtd.textContent =
+          `${clientName}｜投入 ₩ ${formatNumber(clientCost)}｜市值 ₩ ${formatNumber(clientValue)}｜盈亏 ₩ ${formatNumber(clientPnl)}（${formatPercent(clientRate)}）`;
+        gtr.appendChild(gtd);
+        tableBody.appendChild(gtr);
+
+        // 明细
+        list.forEach(h => {
+          const qty = Number(h.quantity) || 0;
+          const cost = Number(h.cost) || 0;
+          const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
+          const value = qty * cur;
+          const pnl = value - qty * cost;
+          const rate = qty * cost > 0 ? (pnl / (qty * cost)) * 100 : 0;
+
+          const tr = document.createElement("tr");
+
+          // 止损 / 止盈颜色高亮
+          if (h.currentPrice != null) {
+            const cp = Number(h.currentPrice);
+            if (h.stopLoss && cp <= Number(h.stopLoss)) {
+              tr.style.background = "rgba(127,29,29,0.4)";
+            } else if (h.takeProfit && cp >= Number(h.takeProfit)) {
+              tr.style.background = "rgba(22,101,52,0.4)";
+            }
           }
-        }
 
-        const tdClient = document.createElement("td");
-        tdClient.className = "t-left";
-        tdClient.textContent = h.client;
+          const tdClient = document.createElement("td");
+          tdClient.className = "t-left";
+          tdClient.textContent = h.client;
 
-        const tdStock = document.createElement("td");
-        tdStock.className = "t-left";
-        tdStock.textContent = h.stockName;
+          const tdStock = document.createElement("td");
+          tdStock.className = "t-left";
+          tdStock.textContent = h.stockName;
 
-        const tdSymbol = document.createElement("td");
-        tdSymbol.textContent = h.symbol;
+          const tdSymbol = document.createElement("td");
+          tdSymbol.textContent = h.symbol;
 
-        const tdQty = document.createElement("td");
-        tdQty.textContent = h.quantity.toLocaleString("ko-KR");
+          const tdQty = document.createElement("td");
+          tdQty.textContent = formatNumber(qty);
 
-        const tdCost = document.createElement("td");
-        tdCost.textContent = h.cost.toLocaleString("ko-KR");
+          const tdCost = document.createElement("td");
+          tdCost.textContent = formatNumber(cost);
 
-        const tdSL = document.createElement("td");
-        tdSL.textContent = h.stopLoss ? h.stopLoss.toLocaleString("ko-KR") : "-";
+          const tdSL = document.createElement("td");
+          tdSL.textContent = h.stopLoss ? formatNumber(Number(h.stopLoss)) : "-";
 
-        const tdTP = document.createElement("td");
-        tdTP.textContent = h.takeProfit ? h.takeProfit.toLocaleString("ko-KR") : "-";
+          const tdTP = document.createElement("td");
+          tdTP.textContent = h.takeProfit ? formatNumber(Number(h.takeProfit)) : "-";
 
-        const tdCur = document.createElement("td");
-        tdCur.textContent = h.currentPrice != null
-          ? h.currentPrice.toLocaleString("ko-KR")
-          : "-";
+          const tdCur = document.createElement("td");
+          tdCur.textContent = h.currentPrice != null ? formatNumber(Number(h.currentPrice)) : "-";
 
-        const tdVal = document.createElement("td");
-        tdVal.textContent = value.toLocaleString("ko-KR");
+          const tdVal = document.createElement("td");
+          tdVal.textContent = formatNumber(value);
 
-        const tdPnl = document.createElement("td");
-        tdPnl.textContent = pnl.toLocaleString("ko-KR");
-        tdPnl.style.fontWeight = "600";
-        tdPnl.style.color = pnl > 0 ? "#16a34a" : pnl < 0 ? "#dc2626" : "#111827";
+          const tdPnl = document.createElement("td");
+          tdPnl.textContent = formatNumber(pnl);
+          tdPnl.style.color = pnl > 0 ? "#4ade80" : pnl < 0 ? "#fca5a5" : "#e5e7eb";
+          tdPnl.style.fontWeight = "600";
 
-        const tdRate = document.createElement("td");
-        const pill = document.createElement("span");
-        pill.className =
-          "pill " +
-          (rate > 0 ? "pill-gain" : rate < 0 ? "pill-loss" : "pill-neutral");
-        pill.textContent = formatPercent(rate);
-        tdRate.appendChild(pill);
+          const tdRate = document.createElement("td");
+          const pill = document.createElement("span");
+          pill.className =
+            "pill " +
+            (rate > 0 ? "pill-gain" : rate < 0 ? "pill-loss" : "pill-neutral");
+          pill.textContent = formatPercent(rate);
+          tdRate.appendChild(pill);
 
-        const tdActions = document.createElement("td");
-        tdActions.className = "t-left";
-        const actDiv = document.createElement("div");
-        actDiv.className = "actions";
+          const tdActions = document.createElement("td");
+          tdActions.className = "t-left";
+          const actionsDiv = document.createElement("div");
+          actionsDiv.className = "row-actions";
 
-        const editBtn = document.createElement("button");
-        editBtn.type = "button";
-        editBtn.className = "btn-secondary";
-        editBtn.textContent = "编辑";
-        editBtn.onclick = () => startEdit(h);
+          const editBtn = document.createElement("button");
+          editBtn.type = "button";
+          editBtn.className = "btn btn-ghost btn-sm";
+          editBtn.textContent = "编辑";
+          editBtn.onclick = () => startEdit(h.id);
 
-        const delBtn = document.createElement("button");
-        delBtn.type = "button";
-        delBtn.className = "btn-danger-outline";
-        delBtn.textContent = "删除";
-        delBtn.onclick = () => deleteHolding(h.id);
+          const delBtn = document.createElement("button");
+          delBtn.type = "button";
+          delBtn.className = "btn btn-danger btn-sm";
+          delBtn.textContent = "删除";
+          delBtn.onclick = () => deleteHolding(h.id);
 
-        const oneRefreshBtn = document.createElement("button");
-        oneRefreshBtn.type = "button";
-        oneRefreshBtn.className = "btn-ghost";
-        oneRefreshBtn.textContent = "🔄";
-        oneRefreshBtn.title = "刷新该股票行情";
-        oneRefreshBtn.onclick = () => refreshPrices([h.symbol]);
+          const oneRefreshBtn = document.createElement("button");
+          oneRefreshBtn.type = "button";
+          oneRefreshBtn.className = "btn btn-ghost btn-sm";
+          oneRefreshBtn.textContent = "🔄";
+          oneRefreshBtn.title = "刷新该股票行情";
+          oneRefreshBtn.onclick = () => refreshPrices([h.symbol]);
 
-        actDiv.appendChild(oneRefreshBtn);
-        actDiv.appendChild(editBtn);
-        actDiv.appendChild(delBtn);
-        tdActions.appendChild(actDiv);
+          actionsDiv.appendChild(oneRefreshBtn);
+          actionsDiv.appendChild(editBtn);
+          actionsDiv.appendChild(delBtn);
+          tdActions.appendChild(actionsDiv);
 
-        tr.appendChild(tdClient);
-        tr.appendChild(tdStock);
-        tr.appendChild(tdSymbol);
-        tr.appendChild(tdQty);
-        tr.appendChild(tdCost);
-        tr.appendChild(tdSL);
-        tr.appendChild(tdTP);
-        tr.appendChild(tdCur);
-        tr.appendChild(tdVal);
-        tr.appendChild(tdPnl);
-        tr.appendChild(tdRate);
-        tr.appendChild(tdActions);
+          tr.appendChild(tdClient);
+          tr.appendChild(tdStock);
+          tr.appendChild(tdSymbol);
+          tr.appendChild(tdQty);
+          tr.appendChild(tdCost);
+          tr.appendChild(tdSL);
+          tr.appendChild(tdTP);
+          tr.appendChild(tdCur);
+          tr.appendChild(tdVal);
+          tr.appendChild(tdPnl);
+          tr.appendChild(tdRate);
+          tr.appendChild(tdActions);
 
-        tableBody.appendChild(tr);
+          tableBody.appendChild(tr);
+        });
       });
     }
 
-    function renderSummary() {
-      let totalCost = 0;
-      let totalValue = 0;
-      holdings.forEach((h) => {
-        const cost = h.quantity * h.cost;
-        const cur = h.currentPrice ?? h.cost;
-        const value = h.quantity * cur;
-        totalCost += cost;
-        totalValue += value;
-      });
-      const pnl = totalValue - totalCost;
-      const rate = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
-
-      totalCostEl.textContent = formatCurrencyKRW(totalCost);
-      totalValueEl.textContent = formatCurrencyKRW(totalValue);
-      totalPnlEl.textContent = formatCurrencyKRW(pnl);
-      totalReturnEl.textContent = formatPercent(rate);
-
-      totalPnlEl.className =
-        "summary-value " + (pnl > 0 ? "gain" : pnl < 0 ? "loss" : "");
-      totalReturnEl.className =
-        "summary-value " + (rate > 0 ? "gain" : rate < 0 ? "loss" : "");
-
-      positionCountEl.textContent = `当前持仓：${holdings.length} 条记录`;
+    function renderAll() {
+      renderSummary();
+      renderTable();
     }
 
     function resetForm() {
+      editIdInput.value = "";
+      submitLabel.textContent = "保存持仓";
       form.reset();
-      editingIdInput.value = "";
-      submitBtn.textContent = "保存持仓";
-      clientInput.focus();
     }
 
-    function startEdit(h) {
-      editingIdInput.value = h.id;
+    function startEdit(id) {
+      const h = holdings.find(x => x.id === id);
+      if (!h) return;
+      editIdInput.value = h.id;
       clientInput.value = h.client;
       stockNameInput.value = h.stockName;
       symbolInput.value = h.symbol;
@@ -645,17 +702,14 @@
       costInput.value = h.cost;
       stopLossInput.value = h.stopLoss ?? "";
       takeProfitInput.value = h.takeProfit ?? "";
-      submitBtn.textContent = "保存修改";
-      clientInput.focus();
+      submitLabel.textContent = "保存修改";
     }
 
     function deleteHolding(id) {
-      const target = holdings.find((x) => x.id === id);
-      if (!target) return;
-      if (!confirm(`删除 ${target.client} 的 ${target.stockName} 持仓？`)) return;
-      holdings = holdings.filter((x) => x.id !== id);
-      saveHoldingsToStorage();
-      render();
+      if (!confirm("确定删除该条持仓记录吗？")) return;
+      holdings = holdings.filter(h => h.id !== id);
+      saveHoldings();
+      resetForm();
     }
 
     form.addEventListener("submit", (e) => {
@@ -669,32 +723,23 @@
       const takeProfit = takeProfitInput.value ? Number(takeProfitInput.value) : null;
 
       if (!client || !stockName || !symbol || !quantity || !cost) {
-        alert("必填项不能为空（客户 / 股票 / symbol / 数量 / 成本）");
+        alert("请完整填写必填项。");
         return;
       }
 
-      const now = new Date().toISOString();
-      const id = editingIdInput.value;
-
+      const id = editIdInput.value;
       if (id) {
-        holdings = holdings.map((h) =>
-          h.id === id
-            ? {
-                ...h,
-                client,
-                stockName,
-                symbol,
-                quantity,
-                cost,
-                stopLoss,
-                takeProfit,
-                updatedAt: now
-              }
-            : h
-        );
+        const idx = holdings.findIndex(h => h.id === id);
+        if (idx >= 0) {
+          holdings[idx] = {
+            ...holdings[idx],
+            client, stockName, symbol,
+            quantity, cost, stopLoss, takeProfit
+          };
+        }
       } else {
         holdings.push({
-          id: generateId(),
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
           client,
           stockName,
           symbol,
@@ -702,96 +747,188 @@
           cost,
           stopLoss,
           takeProfit,
-          currentPrice: cost,
-          createdAt: now,
-          updatedAt: now
+          currentPrice: null,
+          updatedAt: null
         });
       }
-
-      saveHoldingsToStorage();
-      render();
+      saveHoldings();
       resetForm();
     });
 
-    resetFormBtn.addEventListener("click", () => resetForm());
+    resetBtn.addEventListener("click", () => {
+      resetForm();
+    });
 
     clearAllBtn.addEventListener("click", () => {
-      if (!holdings.length) return;
-      if (!confirm("确定清空当前浏览器里的所有持仓记录？")) return;
+      if (!confirm("确定清空本机所有持仓记录吗？")) return;
       holdings = [];
-      saveHoldingsToStorage();
-      render();
+      saveHoldings();
+      resetForm();
     });
 
-    async function refreshPrices(symbolsOverride) {
-      const symbols =
-        symbolsOverride ||
-        [...new Set(holdings.map((h) => h.symbol).filter(Boolean))];
+    // === 自动刷新相关 ===
+    function setAutoRefresh(on) {
+      if (autoTimer) {
+        clearInterval(autoTimer);
+        autoTimer = null;
+      }
+      if (on) {
+        const sec = Number(intervalSelect.value) || 60;
+        autoTimer = setInterval(() => {
+          if (holdings.length) refreshPrices();
+        }, sec * 1000);
+      }
+    }
 
-      if (!symbols.length) return;
+    autoToggle.addEventListener("change", () => {
+      setAutoRefresh(autoToggle.checked);
+      if (autoToggle.checked && holdings.length) {
+        refreshPrices();
+      }
+    });
+
+    intervalSelect.addEventListener("change", () => {
+      if (autoToggle.checked) setAutoRefresh(true);
+    });
+
+    refreshBtn.addEventListener("click", () => {
+      refreshPrices();
+    });
+
+    // === 批量刷新行情 ===
+    async function refreshPrices(symbolsOverride) {
+      if (!holdings.length && !symbolsOverride) return;
+
+      let symbols;
+      if (symbolsOverride && symbolsOverride.length) {
+        symbols = Array.from(new Set(symbolsOverride));
+      } else {
+        symbols = Array.from(new Set(holdings.map(h => h.symbol)));
+      }
 
       try {
-        const result = await api("/api/prices", {
+        const res = await fetch("/api/prices", {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ symbols })
         });
-
+        if (!res.ok) {
+          console.error("行情刷新失败:", await res.text());
+          return;
+        }
+        const data = await res.json();
         const now = new Date().toISOString();
-        const triggered = [];
 
-        holdings.forEach((h) => {
-          const info = result[h.symbol];
+        holdings.forEach(h => {
+          const info = data[h.symbol];
           if (info && info.ok) {
-            h.currentPrice = info.price;
+            h.currentPrice = Number(info.price);
             h.updatedAt = now;
-
-            if (h.stopLoss && h.currentPrice <= h.stopLoss) {
-              triggered.push({ type: "止损", h });
-            } else if (h.takeProfit && h.currentPrice >= h.takeProfit) {
-              triggered.push({ type: "止盈", h });
-            }
           }
         });
-
-        saveHoldingsToStorage();
-        render();
-        lastUpdateEl.textContent = "最近行情更新时间：" + formatDateTime(now);
-
-        if (triggered.length) {
-          try {
-            alertSound.currentTime = 0;
-            alertSound.play().catch(() => {});
-          } catch (e) {}
-          const msg = triggered
-            .map((t) => `${t.type}触发：${t.h.client} - ${t.h.stockName} (${t.h.symbol})`)
-            .join("\n");
-          alert(msg);
-        }
+        saveHoldings();
       } catch (e) {
-        alert("刷新行情失败：" + e.message);
+        console.error("刷新行情异常:", e);
       }
     }
 
-    refreshBtn.addEventListener("click", () => refreshPrices());
-
-    function updateAutoBtnText() {
-      toggleAutoBtn.textContent = autoOn ? "⏱ 关闭自动刷新" : "⏱ 开启自动刷新";
-    }
-
-    toggleAutoBtn.addEventListener("click", () => {
-      autoOn = !autoOn;
-      if (autoOn) {
-        refreshPrices();
-        autoTimer = setInterval(refreshPrices, AUTO_INTERVAL_MS);
-      } else {
-        if (autoTimer) clearInterval(autoTimer);
+    // === 导出收益日报（CSV） ===
+    exportBtn.addEventListener("click", () => {
+      if (!holdings.length) {
+        alert("当前没有任何持仓记录可导出。");
+        return;
       }
-      updateAutoBtnText();
+      const rows = [];
+      rows.push([
+        "客户",
+        "股票",
+        "代码",
+        "数量",
+        "成本价",
+        "现价",
+        "市值",
+        "盈亏",
+        "收益率(%)",
+        "止损",
+        "止盈",
+        "更新时间"
+      ]);
+
+      holdings.forEach(h => {
+        const qty = Number(h.quantity) || 0;
+        const cost = Number(h.cost) || 0;
+        const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
+        const val = qty * cur;
+        const pnl = val - qty * cost;
+        const rate = qty * cost > 0 ? (pnl / (qty * cost)) * 100 : 0;
+
+        rows.push([
+          h.client,
+          h.stockName,
+          h.symbol,
+          qty,
+          cost,
+          cur,
+          val,
+          pnl,
+          rate.toFixed(2),
+          h.stopLoss ?? "",
+          h.takeProfit ?? "",
+          h.updatedAt ? new Date(h.updatedAt).toLocaleString("zh-CN") : ""
+        ]);
+      });
+
+      // 简单按客户汇总一行
+      rows.push([]);
+      rows.push(["=== 按客户汇总 ==="]);
+      const groups = groupByClient(holdings);
+      Object.keys(groups).forEach(name => {
+        const list = groups[name];
+        let costSum = 0, valSum = 0;
+        list.forEach(h => {
+          const qty = Number(h.quantity) || 0;
+          const cost = Number(h.cost) || 0;
+          const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
+          costSum += qty * cost;
+          valSum += qty * cur;
+        });
+        const pnl = valSum - costSum;
+        const rate = costSum > 0 ? (pnl / costSum) * 100 : 0;
+        rows.push([
+          name,
+          "",
+          "",
+          "",
+          "",
+          "",
+          valSum,
+          pnl,
+          rate.toFixed(2)
+        ]);
+      });
+
+      const csv = rows
+        .map(r => r.map(x => `"${String(x).replace(/"/g,'""')}"`).join(","))
+        .join("\r\n");
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2,"0");
+      const d = String(now.getDate()).padStart(2,"0");
+      a.href = url;
+      a.download = `korea_portfolio_daily_${y}${m}${d}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     });
 
-    holdings = loadHoldingsFromStorage();
-    render();
-    updateAutoBtnText();
+    // === 初始化 ===
+    loadHoldings();
+    renderAll();
   </script>
 </body>
 </html>
