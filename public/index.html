@@ -633,82 +633,88 @@
     aiBackdrop.addEventListener("click", closeAiModal);
     aiModalClose.addEventListener("click", closeAiModal);
 
-    // 单只股票解析
+    // 单只股票解析（精简专业版 + 客户短句）
     function generateHoldingAdvice(h) {
       const qty = Number(h.quantity) || 0;
       const cost = Number(h.cost) || 0;
       const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
-      const value = qty * cur;
-      const pnl = value - qty * cost;
-      const rate = qty * cost > 0 ? (pnl / (qty * cost)) * 100 : 0;
-
+      const pnl = (cur - cost) * qty;
+      const rate = qty * cost > 0 ? ((pnl / (qty * cost)) * 100) : 0;
       const stopLoss = h.stopLoss ? Number(h.stopLoss) : null;
       const takeProfit = h.takeProfit ? Number(h.takeProfit) : null;
 
-      const lines = [];
+      let msg = `【${h.stockName}｜${h.symbol}】\n`;
 
-      lines.push(
-        `【持仓概况】\n` +
-        `客户：${h.client}\n` +
-        `标的：${h.stockName}（${h.symbol}）\n` +
-        `持股数量：${formatNumber(qty)} 股\n` +
-        `持仓成本：₩ ${formatNumber(cost)}\n` +
-        `当前价格：₩ ${formatNumber(cur)}\n` +
-        `浮动盈亏：₩ ${formatNumber(pnl)}（${formatPercent(rate)}）`
-      );
+      // 盈亏 & 趋势结论
+      if (rate >= 12) msg += `短线趋势偏强，获利区间较好。`;
+      else if (rate >= 3) msg += `仍属健康震荡，中期向上概率偏大。`;
+      else if (rate > -6) msg += `围绕成本来回震荡，方向暂未走出来。`;
+      else if (rate > -15) msg += `出现明显回撤，趋势偏弱，情绪略谨慎。`;
+      else msg += `处于深度回撤区间，短期反弹难度较大，需格外谨慎。`;
 
-      let strategy = "【策略建议】\n";
-      if (rate >= 15) {
-        strategy +=
-          "目前处于较大盈利区间，建议分批锁定收益：可以先兑现一部分仓位，将利润落袋，其余仓位根据后续趋势再决定是否继续持有。";
-      } else if (rate >= 5) {
-        strategy +=
-          "当前处于温和盈利状态，可以根据个人风险偏好设置跟踪止盈：若短期放量上冲，可以尝试再多看一两个交易日；若放量滞涨或跌破短期均线，建议及时减仓。";
-      } else if (rate > -5) {
-        strategy +=
-          "目前盈亏波动较小，属于正常震荡区间。建议重点关注基本面和板块情绪变化，不必过度频繁操作，等待更明确的方向再做决策。";
+      // 板块 / 情绪 / 成交量 / 资金维度
+      msg += ` 当前走势的关键在：①板块整体情绪是否配合，②能否放量突破关键价位，③主力/机构资金是否持续回流。`;
+
+      // 实战操作建议（止盈/止损/仓位）
+      if (rate >= 12) {
+        msg += ` 建议以分批落袋为主，适当降低仓位，既保住利润又保留部分仓位跟随趋势。`;
+      } else if (rate >= 3) {
+        msg += ` 可继续持有，重点观察放量突破前高的力度，不宜追高加仓，必要时高位减一部分锁定收益。`;
+      } else if (rate > -6) {
+        msg += ` 暂不建议频繁操作，等出现放量突破或跌破关键支撑后再决定是顺势加仓还是果断减仓。`;
       } else if (rate > -15) {
-        strategy +=
-          "浮亏在可承受范围内，建议结合基本面判断：若逻辑未变、趋势仍在，可考虑不加仓、轻仓观望；若出现利空或技术面走坏，跌破关键支撑位时要果断止损。";
+        msg += ` 建议先适度减仓，把整体仓位压下来，等待情绪修复或放量企稳后再考虑重新布局。`;
       } else {
-        strategy +=
-          "浮亏幅度较大，需要谨慎评估是否继续持有：首先确认是否出现基本面恶化或题材降温；若确认逻辑破坏，建议利用反弹机会减仓或止损离场，避免亏损进一步扩大。";
-      }
-      lines.push(strategy);
-
-      if (stopLoss || takeProfit) {
-        let extra = "【计划价位】\n";
-        if (stopLoss) {
-          extra += `止损价：₩ ${formatNumber(stopLoss)} `;
-          if (cur <= stopLoss) {
-            extra += "（已接近/跌破止损价，建议优先确认是否执行原有纪律。）\n";
-          } else {
-            extra += "（尚未触及止损，继续按计划观察。）\n";
-          }
-        }
-        if (takeProfit) {
-          extra += `止盈价：₩ ${formatNumber(takeProfit)} `;
-          if (cur >= takeProfit) {
-            extra += "（已接近/达到止盈价，可按原计划考虑分批兑现收益。）\n";
-          } else {
-            extra += "（尚未到达止盈位，可根据盘中放量情况灵活调整。）\n";
-          }
-        }
-        lines.push(extra.trimEnd());
+        msg += ` 建议以风险控制为先，利用反弹分批退出，把资金转向确定性更高、流动性更好的标的。`;
       }
 
-      lines.push(
-        "【风险提示】\n" +
-        "以上为系统根据当前价格和盈亏区间自动生成的参考意见，未综合个股所有基本面与资金信息，不构成任何保证或承诺，最终买卖请结合您的资金状况与风险承受能力独立决策。"
-      );
+      // 止盈 / 止损提醒
+      if (takeProfit && cur >= takeProfit) {
+        msg += ` 目前价格已处在或接近预设止盈区间，可按原计划分批兑现利润。`;
+      }
+      if (stopLoss && cur <= stopLoss) {
+        msg += ` 已接近或跌破止损线，建议优先考虑执行止损纪律，避免亏损进一步扩大。`;
+      }
 
-      return lines.join("\n\n");
+      // 补仓判断
+      if (rate <= 0) {
+        msg += ` 在趋势尚未重新走强前，不建议补仓，避免越补越深。`;
+      } else {
+        msg += ` 如后续回踩支撑且成交量缩量，价格企稳后可以小仓位低吸补一点，但不宜大幅加码。`;
+      }
+
+      // 后市关键点
+      msg += ` 后续重点看是否“放量突破而不是放量滞涨”，突破可以顺势多看一段，若放量不上涨则应以落袋和减仓为主。`;
+
+      // 激励语气（按盈亏区间）
+      if (rate >= 8) {
+        msg += ` 当前整体节奏把握得不错，接下来主要是控制回撤，把账面盈利尽量转成已实现收益。`;
+      } else if (rate >= -5) {
+        msg += ` 目前属于正常波动范围，关键在于耐心等待方向，不急于做过多动作。`;
+      } else {
+        msg += ` 现在最重要的是稳住仓位和情绪，把风险控制在自己能接受的范围内，比盲目“解套”更重要。`;
+      }
+
+      // 给客户的短句话术
+      let short = "";
+      if (rate >= 8) {
+        short = `现在这笔仓位盈利不错，建议您分批锁定一部分收益，剩余仓位我们再顺势看一看即可。`;
+      } else if (rate >= 0) {
+        short = `目前整体处于正常震荡，先观察是否能放量突破，等方向更清晰后再一起调整。`;
+      } else if (rate > -10) {
+        short = `这笔仓位有一定回撤，建议先把仓位适当降一下，等情绪和走势稳定后，我们再考虑下一步。`;
+      } else {
+        short = `目前跌幅偏大，后面反弹我们会分批往外腾一部分仓位，尽量把损失控制住，再换到更有把握的机会。`;
+      }
+
+      msg += `\n\n📌 给客户的发送话术：\n${short}`;
+
+      return msg;
     }
 
-    // 单个客户整体解析
+    // 单个客户整体持仓解析（精简专业版 + 客户短句）
     function generateClientAdvice(clientName, list) {
-      let totalCost = 0;
-      let totalValue = 0;
+      let totalCost = 0, totalValue = 0;
       list.forEach(h => {
         const qty = Number(h.quantity) || 0;
         const cost = Number(h.cost) || 0;
@@ -719,68 +725,61 @@
       const pnl = totalValue - totalCost;
       const rate = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
 
-      const lines = [];
+      let msg = `【${clientName} · 持仓整体点评】\n`;
 
-      lines.push(
-        `【客户总体概况】\n` +
-        `客户：${clientName}\n` +
-        `总投入成本：₩ ${formatNumber(totalCost)}\n` +
-        `当前市值：₩ ${formatNumber(totalValue)}\n` +
-        `总体浮动盈亏：₩ ${formatNumber(pnl)}（${formatPercent(rate)}）\n` +
-        `持仓标的数量：${list.length} 只`
-      );
+      // 组合总体状态
+      if (rate >= 10) msg += `整体盈利表现不错，节奏和选股方向都基本站得住。`;
+      else if (rate >= 0) msg += `整体处于小幅盈亏震荡阶段，仓位风险可控，但结构还有优化空间。`;
+      else if (rate > -10) msg += `组合出现一定回撤，但整体仍在可管理区间，主要问题在持仓结构和节奏。`;
+      else msg += `目前组合回撤偏大，需要先把风险降下来，再考虑后续机会。`;
 
-      let overall = "【整体仓位建议】\n";
-      if (rate >= 15) {
-        overall +=
-          "整体浮盈水平较高，建议逐步落袋为主：可按照个股强弱分批减仓，优先兑现近期涨幅过快、基本面弹性有限的标的，为后续行情预留现金弹药。";
-      } else if (rate >= 5) {
-        overall +=
-          "整体盈利良好，可以在保持基本仓位的前提下，针对涨幅过大的个股适当减仓，把账面收益转为已实现收益，同时优化持仓结构。";
-      } else if (rate > -5) {
-        overall +=
-          "整体盈亏基本持平，属于正常波动区间。建议以调仓优化为主：适当降低弱势或逻辑不清的个股仓位，把资金集中到确定性更高的核心标的上。";
-      } else if (rate > -15) {
-        overall +=
-          "组合处于可控回撤区间，建议尽快梳理持仓逻辑：对基本面良好、估值合理的品种可耐心持有；对题材边缘、成交低迷的品种，建议利用反弹机会做减仓处理。";
+      // 找出最大权重标的
+      const sorted = [...list].map(h => {
+        const qty = Number(h.quantity) || 0;
+        const cost = Number(h.cost) || 0;
+        const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
+        return { ...h, value: qty * cur };
+      }).sort((a, b) => b.value - a.value);
+
+      if (sorted.length) {
+        const top = sorted[0];
+        const weight = totalValue > 0 ? (top.value / totalValue) * 100 : 0;
+        msg += ` 目前权重最高的是 ${top.stockName}（${top.symbol}），约占组合市值的 ${weight.toFixed(1)}%，它的走势会对整体净值影响比较大，需要重点盯一下成交量和板块情绪。`;
+      }
+
+      // 操作方向 & 风险控制
+      if (rate >= 8) {
+        msg += ` 后续建议把涨幅大、波动大的标的适当减仓，锁定一部分盈利，同时把资金向确定性更高、基本面更清晰的主线集中。`;
+      } else if (rate >= 0) {
+        msg += ` 建议减少边缘题材和成交量偏弱的个股仓位，把仓位更多放在流动性好、趋势明确的核心品种上。`;
       } else {
-        overall +=
-          "组合回撤幅度较大，需重点控制风险：一方面考虑降低整体仓位，把部分资金转为现金以降低波动；另一方面优先清理逻辑不再成立或流动性较差的个股，避免“越套越深”。";
-      }
-      lines.push(overall);
-
-      if (list.length >= 1) {
-        const biggest = [...list].sort((a, b) => {
-          const qa = Number(a.quantity) || 0;
-          const ca = Number(a.cost) || 0;
-          const pa = a.currentPrice != null ? Number(a.currentPrice) : ca;
-          const va = qa * pa;
-          const qb = Number(b.quantity) || 0;
-          const cb = Number(b.cost) || 0;
-          const pb = b.currentPrice != null ? Number(b.currentPrice) : cb;
-          const vb = qb * pb;
-          return vb - va;
-        })[0];
-
-        const bq = Number(biggest.quantity) || 0;
-        const bc = Number(biggest.cost) || 0;
-        const bp = biggest.currentPrice != null ? Number(biggest.currentPrice) : bc;
-        const bv = bq * bp;
-        const weight = totalValue > 0 ? (bv / totalValue) * 100 : 0;
-
-        lines.push(
-          "【持仓结构提示】\n" +
-          `当前仓位中权重最高的标的是：${biggest.stockName}（${biggest.symbol}），约占组合市值的 ${weight.toFixed(1)}%。\n` +
-          `建议关注该标的短期波动对整体资产曲线的影响，必要时通过控制该标的仓位来平滑整体波动。`
-        );
+        msg += ` 建议先清理亏损较重、逻辑不再清晰或流动性较差的持仓，把整体仓位降下来，让组合先处在一个自己舒服的风险水平。`;
       }
 
-      lines.push(
-        "【风险提示】\n" +
-        "以上为程序根据当前组合盈亏与持仓结构自动生成的参考意见，未充分覆盖所有个股的基本面与宏观因素，仅供交流参考，最终投资决策请结合实际情况谨慎判断。"
-      );
+      msg += ` 后市关键仍在于：大盘和主流板块的情绪能否企稳、成交量能否放大，以及资金是否继续向您持有的主线方向集中。`;
 
-      return lines.join("\n\n");
+      // 激励语气
+      if (rate >= 6) {
+        msg += ` 整体来说这段时间的节奏是不错的，现在主要是边走边落袋，尽量别把到手的收益再吐回去。`;
+      } else if (rate >= -5) {
+        msg += ` 目前属于正常波动范围，通过一点点调仓换股把结构调顺，后面机会还是有的。`;
+      } else {
+        msg += ` 调整阶段很正常，关键是先稳住净值和心态，后面有更好的时机我们再慢慢把损失抢回来。`;
+      }
+
+      // 给客户的短句话术
+      let short = "";
+      if (rate >= 6) {
+        short = `整体组合现在盈利还不错，接下来我们会边走边锁定收益，尽量把赚到的先装进口袋里。`;
+      } else if (rate >= 0) {
+        short = `目前整体在正常震荡区间，我们会帮您把弱势仓位慢慢换掉，把资金集中到更有把握的主线上。`;
+      } else {
+        short = `现在组合有一定回撤，接下来我们会优先把风险高、没什么把握的仓位降下来，等节奏稳住后再去找更好的机会。`;
+      }
+
+      msg += `\n\n📌 给客户的发送话术：\n${short}`;
+
+      return msg;
     }
 
     // 顶部汇总：每个客户一张卡片 + AI按钮
