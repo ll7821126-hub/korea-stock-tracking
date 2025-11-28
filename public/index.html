@@ -9,10 +9,10 @@
     body {
       margin: 0;
       font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
-      background: #0f172a;
-      color: #e5e7eb;
+      background: radial-gradient(circle at top, #e0f2fe 0, #f3f4f6 40%, #e5e7eb 100%);
+      color: #111827;
     }
-    a { color: #38bdf8; text-decoration: none; }
+    a { color: #2563eb; text-decoration: none; }
     a:hover { text-decoration: underline; }
 
     .layout {
@@ -23,18 +23,20 @@
 
     .header {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       margin-bottom: 16px;
+      gap: 12px;
+      flex-wrap: wrap;
     }
     .title {
       font-size: 22px;
       font-weight: 700;
-      color: #f9fafb;
+      color: #0f172a;
     }
     .subtitle {
       font-size: 12px;
-      color: #9ca3af;
+      color: #4b5563;
       margin-top: 4px;
     }
 
@@ -44,10 +46,11 @@
       padding: 4px 10px;
       border-radius: 999px;
       font-size: 11px;
-      background: #0b1120;
-      border: 1px solid #1f2937;
-      color: #9ca3af;
+      background: rgba(37,99,235,0.06);
+      border: 1px solid rgba(37,99,235,0.25);
+      color: #1d4ed8;
       gap: 4px;
+      font-weight: 500;
     }
 
     .grid {
@@ -62,46 +65,50 @@
     }
 
     .card {
-      background: radial-gradient(circle at top left,#1e293b 0,#020617 55%);
-      border-radius: 14px;
-      border: 1px solid #1f2937;
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
       padding: 14px 16px;
-      box-shadow: 0 18px 40px rgba(15,23,42,0.7);
+      box-shadow: 0 12px 25px rgba(15,23,42,0.06);
     }
     .card-title {
       font-size: 14px;
       font-weight: 600;
       margin-bottom: 10px;
-      color: #e5e7eb;
+      color: #111827;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
     .card-title span {
       font-size: 11px;
-      color: #9ca3af;
+      color: #6b7280;
       font-weight: 400;
     }
 
     label {
       display: block;
       font-size: 12px;
-      color: #9ca3af;
+      color: #4b5563;
       margin-bottom: 4px;
     }
     input, select {
       width: 100%;
       border-radius: 9px;
-      border: 1px solid #1f2937;
-      background: #020617;
-      color: #e5e7eb;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      color: #111827;
       font-size: 13px;
       padding: 7px 10px;
       outline: none;
+      transition: border-color .15s, box-shadow .15s, background .15s;
     }
     input:focus, select:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 1px #38bdf8;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37,99,235,0.25);
+      background: #ffffff;
     }
     .row {
       display: grid;
@@ -119,27 +126,34 @@
       align-items: center;
       justify-content: center;
       gap: 4px;
+      transition: transform .05s, box-shadow .1s, filter .1s;
+    }
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: none;
     }
     .btn-primary {
-      background: linear-gradient(135deg,#22c55e,#16a34a);
-      color: #ecfdf5;
+      background: linear-gradient(135deg,#2563eb,#3b82f6);
+      color: #f9fafb;
+      box-shadow: 0 8px 18px rgba(37,99,235,0.35);
     }
-    .btn-primary:hover { filter: brightness(1.05); }
+    .btn-primary:hover { filter: brightness(1.03); }
     .btn-secondary {
-      background: #0b1120;
-      color: #e5e7eb;
-      border: 1px solid #1f2937;
+      background: #ffffff;
+      color: #1f2937;
+      border: 1px solid #cbd5f5;
     }
-    .btn-secondary:hover { border-color: #4b5563; }
+    .btn-secondary:hover { border-color: #94a3b8; }
     .btn-ghost {
-      background: transparent;
-      color: #9ca3af;
-      border: 1px solid #1f2937;
+      background: #f9fafb;
+      color: #4b5563;
+      border: 1px solid #e5e7eb;
     }
-    .btn-ghost:hover { border-color: #6b7280; }
+    .btn-ghost:hover { border-color: #cbd5f5; }
     .btn-danger {
-      background: #7f1d1d;
-      color: #fee2e2;
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
     }
 
     .btn-sm { padding: 4px 10px; font-size: 11px; }
@@ -164,7 +178,7 @@
       align-items: center;
       gap: 6px;
       font-size: 11px;
-      color: #9ca3af;
+      color: #6b7280;
     }
     .switch input {
       width: auto;
@@ -172,33 +186,51 @@
       cursor: pointer;
     }
 
+    /* 顶部汇总区：每个客户一张卡片 */
     .summary {
       display: grid;
-      grid-template-columns: repeat(3,minmax(0,1fr));
-      gap: 8px;
+      grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
+      gap: 10px;
       margin-bottom: 10px;
     }
-    @media (max-width: 900px) {
-      .summary {
-        grid-template-columns: repeat(2,minmax(0,1fr));
-      }
-    }
     .summary-item {
-      padding: 6px 10px;
-      border-radius: 10px;
-      background: #020617;
-      border: 1px solid #1f2937;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+    }
+    .summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 4px;
+      gap: 6px;
+    }
+    .summary-client {
+      font-size: 13px;
+      font-weight: 600;
+      color: #111827;
+    }
+    .summary-rate {
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .summary-rate.positive { color: #16a34a; }
+    .summary-rate.negative { color: #dc2626; }
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #4b5563;
+    }
+    .summary-line + .summary-line {
+      margin-top: 2px;
     }
     .summary-label {
-      font-size: 11px;
-      color: #9ca3af;
-      margin-bottom: 4px;
+      color: #6b7280;
     }
-    .summary-value {
-      font-size: 14px;
-    }
-    .summary-value.positive { color: #22c55e; }
-    .summary-value.negative { color: #ef4444; }
+    .summary-value.positive { color: #16a34a; font-weight: 600; }
+    .summary-value.negative { color: #dc2626; font-weight: 600; }
 
     table {
       width: 100%;
@@ -206,32 +238,32 @@
       font-size: 11px;
     }
     thead {
-      background: #020617;
+      background: #f1f5f9;
       position: sticky;
       top: 0;
       z-index: 5;
     }
     th, td {
       padding: 6px 8px;
-      border-bottom: 1px solid #111827;
+      border-bottom: 1px solid #e5e7eb;
       text-align: right;
       white-space: nowrap;
     }
     th {
       font-weight: 500;
-      color: #9ca3af;
+      color: #6b7280;
     }
     td.t-left, th.t-left { text-align: left; }
 
     tbody tr:hover {
-      background: rgba(15,23,42,0.7);
+      background: #f9fafb;
     }
 
     .group-row td {
-      background: #020617;
-      border-bottom-color: #1f2937;
+      background: #eef2ff;
+      border-bottom-color: #c7d2fe;
       font-weight: 600;
-      color: #e5e7eb;
+      color: #1e293b;
     }
 
     .pill {
@@ -242,9 +274,9 @@
       align-items: center;
       justify-content: center;
     }
-    .pill-gain { background: rgba(22,163,74,0.15); color: #4ade80; }
-    .pill-loss { background: rgba(220,38,38,0.15); color: #fca5a5; }
-    .pill-neutral { background: #020617; color: #9ca3af; }
+    .pill-gain { background: #dcfce7; color: #15803d; }
+    .pill-loss { background: #fee2e2; color: #b91c1c; }
+    .pill-neutral { background: #e5e7eb; color: #4b5563; }
 
     .tag-alert {
       display: inline-flex;
@@ -253,9 +285,9 @@
       padding: 2px 8px;
       border-radius: 999px;
       font-size: 10px;
-      background: rgba(248,250,252,0.06);
-      border: 1px solid rgba(148,163,184,0.6);
-      color: #e5e7eb;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
     }
 
     .row-actions {
@@ -279,15 +311,15 @@
       padding: 0 6px;
       border-radius: 999px;
       font-size: 10px;
-      border: 1px solid #1f2937;
-      background: #020617;
-      color: #9ca3af;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      color: #6b7280;
     }
 
     .footer {
       margin-top: 16px;
       font-size: 10px;
-      color: #4b5563;
+      color: #9ca3af;
       text-align: right;
     }
   </style>
@@ -298,7 +330,7 @@
       <div>
         <div class="title">韩国股票客户持仓追踪</div>
         <div class="subtitle">
-          客户按姓名分组管理，实时对比买入成本与市值，自动刷新行情，支持导出每日收益日报（本地浏览器存储，安全可控）。
+          客户按姓名分组管理，<b>每位客户单独统计总投入成本 / 当前市值 / 总盈亏 / 收益率</b>，支持自动刷新 Naver 行情与导出收益日报（数据仅保存在本机浏览器中）。
         </div>
       </div>
       <div>
@@ -362,8 +394,8 @@
           </div>
 
           <div style="margin-top:8px; font-size:11px; color:#6b7280;">
-            数据保存在浏览器 <span class="badge">localStorage</span> 中，只在本机可见。<br/>
-            如需多台设备同步，可以后升级为云端版。
+            数据保存在浏览器 <span class="badge">localStorage</span> 中，仅对本机可见。<br/>
+            如需多设备同步，可后续升级为云端版。
           </div>
         </form>
       </section>
@@ -373,7 +405,7 @@
         <div class="card-title">
           持仓概览 · 实时报价
           <span>
-            <span class="tag-alert">自动刷新 + 止盈/止损颜色提示</span>
+            <span class="tag-alert">每位客户单独汇总 · 自动刷新 Naver 行情</span>
           </span>
         </div>
 
@@ -385,8 +417,8 @@
               <label for="autoRefreshToggle" style="margin:0;">自动刷新</label>
             </div>
             <select id="intervalSelect" style="width:auto;">
-              <option value="30">30秒</option>
-              <option value="60" selected>60秒</option>
+              <option value="30" selected>30秒</option>
+              <option value="60">60秒</option>
               <option value="120">120秒</option>
             </select>
           </div>
@@ -395,22 +427,10 @@
           </div>
         </div>
 
-        <div class="summary">
-          <div class="summary-item">
-            <div class="summary-label">总投入成本</div>
-            <div class="summary-value" id="sumCost">₩ 0</div>
-          </div>
-          <div class="summary-item">
-            <div class="summary-label">当前市值</div>
-            <div class="summary-value" id="sumValue">₩ 0</div>
-          </div>
-          <div class="summary-item">
-            <div class="summary-label">总盈亏 / 收益率</div>
-            <div class="summary-value" id="sumPnl">₩ 0（0.00%）</div>
-          </div>
-        </div>
+        <!-- 每个客户独立汇总 -->
+        <div id="summaryContainer" class="summary"></div>
 
-        <div style="max-height:420px; overflow:auto; border-radius:10px; border:1px solid #0f172a;">
+        <div style="max-height:420px; overflow:auto; border-radius:10px; border:1px solid #e5e7eb; margin-top:8px;">
           <table>
             <thead>
               <tr>
@@ -463,10 +483,8 @@
     const exportBtn = document.getElementById("exportBtn");
     const tableBody = document.getElementById("tableBody");
     const emptyTip = document.getElementById("emptyTip");
-    const sumCostEl = document.getElementById("sumCost");
-    const sumValueEl = document.getElementById("sumValue");
-    const sumPnlEl = document.getElementById("sumPnl");
     const submitLabel = document.getElementById("submitLabel");
+    const summaryContainer = document.getElementById("summaryContainer");
 
     let holdings = [];
     let autoTimer = null;
@@ -507,28 +525,62 @@
       return map;
     }
 
+    // 顶部：每个客户一张汇总卡片
     function renderSummary() {
-      let totalCost = 0;
-      let totalValue = 0;
+      summaryContainer.innerHTML = "";
+      const groups = groupByClient(holdings);
+      const clients = Object.keys(groups).sort();
 
-      holdings.forEach(h => {
-        const qty = Number(h.quantity) || 0;
-        const cost = Number(h.cost) || 0;
-        const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
-        totalCost += qty * cost;
-        totalValue += qty * cur;
+      if (!clients.length) {
+        summaryContainer.innerHTML =
+          '<div class="summary-item"><div class="summary-client" style="font-size:12px;color:#6b7280;">暂无持仓记录</div></div>';
+        return;
+      }
+
+      clients.forEach(clientName => {
+        const list = groups[clientName];
+        let totalCost = 0;
+        let totalValue = 0;
+
+        list.forEach(h => {
+          const qty = Number(h.quantity) || 0;
+          const cost = Number(h.cost) || 0;
+          const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
+          totalCost += qty * cost;
+          totalValue += qty * cur;
+        });
+
+        const pnl = totalValue - totalCost;
+        const rate = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
+
+        const card = document.createElement("div");
+        card.className = "summary-item";
+
+        const rateClass = pnl > 0 ? "positive" : pnl < 0 ? "negative" : "";
+        const pnlClass = pnl > 0 ? "summary-value positive" :
+                         pnl < 0 ? "summary-value negative" :
+                         "summary-value";
+
+        card.innerHTML = `
+          <div class="summary-header">
+            <div class="summary-client">${clientName}</div>
+            <div class="summary-rate ${rateClass}">${formatPercent(rate)}</div>
+          </div>
+          <div class="summary-line">
+            <span class="summary-label">总投入成本</span>
+            <span>₩ ${formatNumber(totalCost)}</span>
+          </div>
+          <div class="summary-line">
+            <span class="summary-label">当前市值</span>
+            <span>₩ ${formatNumber(totalValue)}</span>
+          </div>
+          <div class="summary-line">
+            <span class="summary-label">总盈亏</span>
+            <span class="${pnlClass}">₩ ${formatNumber(pnl)}</span>
+          </div>
+        `;
+        summaryContainer.appendChild(card);
       });
-
-      const pnl = totalValue - totalCost;
-      const rate = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
-
-      sumCostEl.textContent = "₩ " + formatNumber(totalCost);
-      sumValueEl.textContent = "₩ " + formatNumber(totalValue);
-
-      sumPnlEl.textContent = `₩ ${formatNumber(pnl)}（${formatPercent(rate)}）`;
-      sumPnlEl.classList.remove("positive","negative");
-      if (pnl > 0) sumPnlEl.classList.add("positive");
-      else if (pnl < 0) sumPnlEl.classList.add("negative");
     }
 
     function renderTable() {
@@ -580,9 +632,9 @@
           if (h.currentPrice != null) {
             const cp = Number(h.currentPrice);
             if (h.stopLoss && cp <= Number(h.stopLoss)) {
-              tr.style.background = "rgba(127,29,29,0.4)";
+              tr.style.background = "#fee2e2";
             } else if (h.takeProfit && cp >= Number(h.takeProfit)) {
-              tr.style.background = "rgba(22,101,52,0.4)";
+              tr.style.background = "#dcfce7";
             }
           }
 
@@ -617,7 +669,7 @@
 
           const tdPnl = document.createElement("td");
           tdPnl.textContent = formatNumber(pnl);
-          tdPnl.style.color = pnl > 0 ? "#4ade80" : pnl < 0 ? "#fca5a5" : "#e5e7eb";
+          tdPnl.style.color = pnl > 0 ? "#16a34a" : pnl < 0 ? "#dc2626" : "#111827";
           tdPnl.style.fontWeight = "600";
 
           const tdRate = document.createElement("td");
@@ -789,7 +841,7 @@
       refreshPrices();
     });
 
-    // 批量刷新行情
+    // 批量刷新行情（后端 /api/prices 使用 Naver）
     async function refreshPrices(symbolsOverride) {
       if (!holdings.length && !symbolsOverride) return;
 
@@ -853,7 +905,7 @@
         const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
         const val = qty * cur;
         const pnl = val - qty * cost;
-        const rate = qty * cost > 0 ? (pnl / qty / cost) * 100 : 0;
+        const rate = qty * cost > 0 ? (pnl / (qty * cost)) * 100 : 0;
 
         rows.push([
           h.client,
