@@ -444,10 +444,8 @@
   </div>
 
   <script>
-    // ==== 本地存储键 ====
     const STORAGE_KEY = "korea_portfolio_tracker_v1";
 
-    // ==== DOM ====
     const form = document.getElementById("holdForm");
     const editIdInput = document.getElementById("editId");
     const clientInput = document.getElementById("client");
@@ -559,7 +557,6 @@
         const clientPnl = clientValue - clientCost;
         const clientRate = clientCost > 0 ? (clientPnl / clientCost) * 100 : 0;
 
-        // 分组行
         const gtr = document.createElement("tr");
         gtr.className = "group-row";
         const gtd = document.createElement("td");
@@ -570,7 +567,6 @@
         gtr.appendChild(gtd);
         tableBody.appendChild(gtr);
 
-        // 明细
         list.forEach(h => {
           const qty = Number(h.quantity) || 0;
           const cost = Number(h.cost) || 0;
@@ -581,7 +577,6 @@
 
           const tr = document.createElement("tr");
 
-          // 止损 / 止盈颜色高亮
           if (h.currentPrice != null) {
             const cp = Number(h.currentPrice);
             if (h.stopLoss && cp <= Number(h.stopLoss)) {
@@ -766,7 +761,6 @@
       resetForm();
     });
 
-    // === 自动刷新相关 ===
     function setAutoRefresh(on) {
       if (autoTimer) {
         clearInterval(autoTimer);
@@ -795,7 +789,7 @@
       refreshPrices();
     });
 
-    // === 批量刷新行情 ===
+    // 批量刷新行情
     async function refreshPrices(symbolsOverride) {
       if (!holdings.length && !symbolsOverride) return;
 
@@ -820,7 +814,7 @@
         const now = new Date().toISOString();
 
         holdings.forEach(h => {
-          const info = data[h.symbol];
+          const info = data[h.symbol] || data[h.symbol.toUpperCase()];
           if (info && info.ok) {
             h.currentPrice = Number(info.price);
             h.updatedAt = now;
@@ -832,7 +826,6 @@
       }
     }
 
-    // === 导出收益日报（CSV） ===
     exportBtn.addEventListener("click", () => {
       if (!holdings.length) {
         alert("当前没有任何持仓记录可导出。");
@@ -860,7 +853,7 @@
         const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
         const val = qty * cur;
         const pnl = val - qty * cost;
-        const rate = qty * cost > 0 ? (pnl / (qty * cost)) * 100 : 0;
+        const rate = qty * cost > 0 ? (pnl / qty / cost) * 100 : 0;
 
         rows.push([
           h.client,
@@ -878,7 +871,6 @@
         ]);
       });
 
-      // 简单按客户汇总一行
       rows.push([]);
       rows.push(["=== 按客户汇总 ==="]);
       const groups = groupByClient(holdings);
@@ -926,7 +918,6 @@
       URL.revokeObjectURL(url);
     });
 
-    // === 初始化 ===
     loadHoldings();
     renderAll();
   </script>

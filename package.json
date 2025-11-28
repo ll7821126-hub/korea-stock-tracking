@@ -1,15 +1,15 @@
 {
-  "name": "korea-stock-tracking",
+  "name": "korea-holdings-tracker",
   "version": "1.0.0",
-  "description": "KOSPI/KOSDAQ realtime portfolio tracker",
-  "main": "index.js",
+  "description": "韩国股票客户持仓追踪 + 实时报价",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node server.js"
   },
   "dependencies": {
-    "axios": "^1.7.2",
+    "axios": "^1.13.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
-    "express": "^4.19.2"
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2"
   }
 }
