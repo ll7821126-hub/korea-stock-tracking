@@ -322,6 +322,76 @@
       color: #9ca3af;
       text-align: right;
     }
+
+    /* ==== AI 解析弹窗 ==== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.35);
+      z-index: 40;
+      display: none;
+    }
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      pointer-events: none;
+    }
+    .modal-inner {
+      pointer-events: auto;
+      width: 100%;
+      max-width: 460px;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 18px 45px rgba(15,23,42,0.45);
+      border: 1px solid #e5e7eb;
+      padding: 12px 14px;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 8px;
+    }
+    .modal-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111827;
+    }
+    .modal-body {
+      max-height: 260px;
+      overflow: auto;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #374151;
+      white-space: pre-wrap;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 6px;
+      margin-top: 4px;
+    }
+    .modal-footer {
+      margin-top: 8px;
+      text-align: right;
+      font-size: 11px;
+      color: #9ca3af;
+    }
+    .btn-ai {
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background: #eef2ff;
+      color: #3730a3;
+      padding: 3px 10px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .btn-ai:hover {
+      border-color: #c7d2fe;
+      background: #e0e7ff;
+    }
   </style>
 </head>
 <body>
@@ -339,639 +409,4 @@
           <strong>KOSPI / KOSDAQ</strong>
         </span>
       </div>
-    </header>
-
-    <main class="grid">
-      <!-- 左侧：新增 / 编辑持仓 -->
-      <section class="card">
-        <div class="card-title">
-          新增 / 修改持仓
-          <span>Symbol 示例：005930.KS（KOSPI）、353200.KQ（KOSDAQ）</span>
-        </div>
-
-        <form id="holdForm">
-          <input type="hidden" id="editId" />
-
-          <label>客户姓名 / 分组名</label>
-          <input id="client" placeholder="例如：张三 / 悟空组" required />
-
-          <label style="margin-top:8px;">股票名称</label>
-          <input id="stockName" placeholder="例如：삼성전자 / 박셀바이오" required />
-
-          <label style="margin-top:8px;">证券代码（可带 .KS / .KQ）</label>
-          <input id="symbol" placeholder="例如：005930.KS / 323990.KQ" required />
-
-          <div class="row" style="margin-top:8px;">
-            <div>
-              <label>持股数量（股）</label>
-              <input id="quantity" type="number" min="1" step="1" required />
-            </div>
-            <div>
-              <label>买入价格（₩）</label>
-              <input id="cost" type="number" min="0" step="1" required />
-            </div>
-          </div>
-
-          <div class="row" style="margin-top:8px;">
-            <div>
-              <label>止损价（选填）</label>
-              <input id="stopLoss" type="number" min="0" step="1" />
-            </div>
-            <div>
-              <label>止盈价（选填）</label>
-              <input id="takeProfit" type="number" min="0" step="1" />
-            </div>
-          </div>
-
-          <div style="margin-top:10px; display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap;">
-            <button type="submit" class="btn btn-primary">
-              <span id="submitLabel">保存持仓</span>
-            </button>
-            <div style="display:flex; gap:6px; flex-wrap:wrap;">
-              <button type="button" id="resetBtn" class="btn btn-secondary btn-sm">清空表单</button>
-              <button type="button" id="clearAllBtn" class="btn btn-danger btn-sm">清空所有持仓（本机）</button>
-            </div>
-          </div>
-
-          <div style="margin-top:8px; font-size:11px; color:#6b7280;">
-            数据保存在浏览器 <span class="badge">localStorage</span> 中，仅对本机可见。<br/>
-            如需多设备同步，可后续升级为云端版。
-          </div>
-        </form>
-      </section>
-
-      <!-- 右侧：汇总 + 明细 -->
-      <section class="card">
-        <div class="card-title">
-          持仓概览 · 实时报价
-          <span>
-            <span class="tag-alert">每位客户单独汇总 · 自动刷新 Naver 行情</span>
-          </span>
-        </div>
-
-        <div class="toolbar">
-          <div class="toolbar-right">
-            <button type="button" id="refreshBtn" class="btn btn-secondary btn-sm">🔄 手动刷新行情</button>
-            <div class="switch">
-              <input type="checkbox" id="autoRefreshToggle" />
-              <label for="autoRefreshToggle" style="margin:0;">自动刷新</label>
-            </div>
-            <select id="intervalSelect" style="width:auto;">
-              <option value="30" selected>30秒</option>
-              <option value="60">60秒</option>
-              <option value="120">120秒</option>
-            </select>
-          </div>
-          <div class="toolbar-right">
-            <button type="button" id="exportBtn" class="btn btn-ghost btn-sm">📤 导出收益日报（CSV）</button>
-          </div>
-        </div>
-
-        <!-- 每个客户独立汇总 -->
-        <div id="summaryContainer" class="summary"></div>
-
-        <div style="max-height:420px; overflow:auto; border-radius:10px; border:1px solid #e5e7eb; margin-top:8px;">
-          <table>
-            <thead>
-              <tr>
-                <th class="t-left">客户</th>
-                <th class="t-left">股票</th>
-                <th>代码</th>
-                <th>数量</th>
-                <th>成本价</th>
-                <th>止损</th>
-                <th>止盈</th>
-                <th>现价</th>
-                <th>市值</th>
-                <th>盈亏</th>
-                <th>收益率</th>
-                <th class="t-left">操作</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-          </table>
-        </div>
-
-        <div id="emptyTip" class="empty-tip" style="display:none;">
-          还没有录入任何持仓记录，请在左侧填写客户与股票信息后点击“保存持仓”。
-        </div>
-
-        <div class="footer">
-          Data by Naver Finance · 每位用户数据仅保存在本机浏览器中。
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <script>
-    const STORAGE_KEY = "korea_portfolio_tracker_v1";
-
-    const form = document.getElementById("holdForm");
-    const editIdInput = document.getElementById("editId");
-    const clientInput = document.getElementById("client");
-    const stockNameInput = document.getElementById("stockName");
-    const symbolInput = document.getElementById("symbol");
-    const quantityInput = document.getElementById("quantity");
-    const costInput = document.getElementById("cost");
-    const stopLossInput = document.getElementById("stopLoss");
-    const takeProfitInput = document.getElementById("takeProfit");
-    const resetBtn = document.getElementById("resetBtn");
-    const clearAllBtn = document.getElementById("clearAllBtn");
-    const refreshBtn = document.getElementById("refreshBtn");
-    const autoToggle = document.getElementById("autoRefreshToggle");
-    const intervalSelect = document.getElementById("intervalSelect");
-    const exportBtn = document.getElementById("exportBtn");
-    const tableBody = document.getElementById("tableBody");
-    const emptyTip = document.getElementById("emptyTip");
-    const submitLabel = document.getElementById("submitLabel");
-    const summaryContainer = document.getElementById("summaryContainer");
-
-    let holdings = [];
-    let autoTimer = null;
-
-    function loadHoldings() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        holdings = raw ? JSON.parse(raw) : [];
-      } catch (e) {
-        holdings = [];
-      }
-    }
-
-    function saveHoldings() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(holdings));
-      renderAll();
-    }
-
-    function formatNumber(n) {
-      return n.toLocaleString("ko-KR");
-    }
-
-    function formatPercent(v) {
-      const n = Number(v);
-      if (!isFinite(n)) return "0.00%";
-      const s = n.toFixed(2) + "%";
-      if (n > 0) return "+" + s;
-      return s;
-    }
-
-    function groupByClient(list) {
-      const map = {};
-      list.forEach(h => {
-        const key = h.client || "未命名客户";
-        if (!map[key]) map[key] = [];
-        map[key].push(h);
-      });
-      return map;
-    }
-
-    // 顶部：每个客户一张汇总卡片
-    function renderSummary() {
-      summaryContainer.innerHTML = "";
-      const groups = groupByClient(holdings);
-      const clients = Object.keys(groups).sort();
-
-      if (!clients.length) {
-        summaryContainer.innerHTML =
-          '<div class="summary-item"><div class="summary-client" style="font-size:12px;color:#6b7280;">暂无持仓记录</div></div>';
-        return;
-      }
-
-      clients.forEach(clientName => {
-        const list = groups[clientName];
-        let totalCost = 0;
-        let totalValue = 0;
-
-        list.forEach(h => {
-          const qty = Number(h.quantity) || 0;
-          const cost = Number(h.cost) || 0;
-          const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
-          totalCost += qty * cost;
-          totalValue += qty * cur;
-        });
-
-        const pnl = totalValue - totalCost;
-        const rate = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
-
-        const card = document.createElement("div");
-        card.className = "summary-item";
-
-        const rateClass = pnl > 0 ? "positive" : pnl < 0 ? "negative" : "";
-        const pnlClass = pnl > 0 ? "summary-value positive" :
-                         pnl < 0 ? "summary-value negative" :
-                         "summary-value";
-
-        card.innerHTML = `
-          <div class="summary-header">
-            <div class="summary-client">${clientName}</div>
-            <div class="summary-rate ${rateClass}">${formatPercent(rate)}</div>
-          </div>
-          <div class="summary-line">
-            <span class="summary-label">总投入成本</span>
-            <span>₩ ${formatNumber(totalCost)}</span>
-          </div>
-          <div class="summary-line">
-            <span class="summary-label">当前市值</span>
-            <span>₩ ${formatNumber(totalValue)}</span>
-          </div>
-          <div class="summary-line">
-            <span class="summary-label">总盈亏</span>
-            <span class="${pnlClass}">₩ ${formatNumber(pnl)}</span>
-          </div>
-        `;
-        summaryContainer.appendChild(card);
-      });
-    }
-
-    function renderTable() {
-      tableBody.innerHTML = "";
-      if (!holdings.length) {
-        emptyTip.style.display = "block";
-        return;
-      }
-      emptyTip.style.display = "none";
-
-      const groups = groupByClient(holdings);
-      const clients = Object.keys(groups).sort();
-
-      clients.forEach(clientName => {
-        const list = groups[clientName];
-
-        let clientCost = 0;
-        let clientValue = 0;
-        list.forEach(h => {
-          const qty = Number(h.quantity) || 0;
-          const cost = Number(h.cost) || 0;
-          const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
-          clientCost += qty * cost;
-          clientValue += qty * cur;
-        });
-        const clientPnl = clientValue - clientCost;
-        const clientRate = clientCost > 0 ? (clientPnl / clientCost) * 100 : 0;
-
-        const gtr = document.createElement("tr");
-        gtr.className = "group-row";
-        const gtd = document.createElement("td");
-        gtd.colSpan = 12;
-        gtd.className = "t-left";
-        gtd.textContent =
-          `${clientName}｜投入 ₩ ${formatNumber(clientCost)}｜市值 ₩ ${formatNumber(clientValue)}｜盈亏 ₩ ${formatNumber(clientPnl)}（${formatPercent(clientRate)}）`;
-        gtr.appendChild(gtd);
-        tableBody.appendChild(gtr);
-
-        list.forEach(h => {
-          const qty = Number(h.quantity) || 0;
-          const cost = Number(h.cost) || 0;
-          const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
-          const value = qty * cur;
-          const pnl = value - qty * cost;
-          const rate = qty * cost > 0 ? (pnl / (qty * cost)) * 100 : 0;
-
-          const tr = document.createElement("tr");
-
-          if (h.currentPrice != null) {
-            const cp = Number(h.currentPrice);
-            if (h.stopLoss && cp <= Number(h.stopLoss)) {
-              tr.style.background = "#fee2e2";
-            } else if (h.takeProfit && cp >= Number(h.takeProfit)) {
-              tr.style.background = "#dcfce7";
-            }
-          }
-
-          const tdClient = document.createElement("td");
-          tdClient.className = "t-left";
-          tdClient.textContent = h.client;
-
-          const tdStock = document.createElement("td");
-          tdStock.className = "t-left";
-          tdStock.textContent = h.stockName;
-
-          const tdSymbol = document.createElement("td");
-          tdSymbol.textContent = h.symbol;
-
-          const tdQty = document.createElement("td");
-          tdQty.textContent = formatNumber(qty);
-
-          const tdCost = document.createElement("td");
-          tdCost.textContent = formatNumber(cost);
-
-          const tdSL = document.createElement("td");
-          tdSL.textContent = h.stopLoss ? formatNumber(Number(h.stopLoss)) : "-";
-
-          const tdTP = document.createElement("td");
-          tdTP.textContent = h.takeProfit ? formatNumber(Number(h.takeProfit)) : "-";
-
-          const tdCur = document.createElement("td");
-          tdCur.textContent = h.currentPrice != null ? formatNumber(Number(h.currentPrice)) : "-";
-
-          const tdVal = document.createElement("td");
-          tdVal.textContent = formatNumber(value);
-
-          const tdPnl = document.createElement("td");
-          tdPnl.textContent = formatNumber(pnl);
-          tdPnl.style.color = pnl > 0 ? "#16a34a" : pnl < 0 ? "#dc2626" : "#111827";
-          tdPnl.style.fontWeight = "600";
-
-          const tdRate = document.createElement("td");
-          const pill = document.createElement("span");
-          pill.className =
-            "pill " +
-            (rate > 0 ? "pill-gain" : rate < 0 ? "pill-loss" : "pill-neutral");
-          pill.textContent = formatPercent(rate);
-          tdRate.appendChild(pill);
-
-          const tdActions = document.createElement("td");
-          tdActions.className = "t-left";
-          const actionsDiv = document.createElement("div");
-          actionsDiv.className = "row-actions";
-
-          const editBtn = document.createElement("button");
-          editBtn.type = "button";
-          editBtn.className = "btn btn-ghost btn-sm";
-          editBtn.textContent = "编辑";
-          editBtn.onclick = () => startEdit(h.id);
-
-          const delBtn = document.createElement("button");
-          delBtn.type = "button";
-          delBtn.className = "btn btn-danger btn-sm";
-          delBtn.textContent = "删除";
-          delBtn.onclick = () => deleteHolding(h.id);
-
-          const oneRefreshBtn = document.createElement("button");
-          oneRefreshBtn.type = "button";
-          oneRefreshBtn.className = "btn btn-ghost btn-sm";
-          oneRefreshBtn.textContent = "🔄";
-          oneRefreshBtn.title = "刷新该股票行情";
-          oneRefreshBtn.onclick = () => refreshPrices([h.symbol]);
-
-          actionsDiv.appendChild(oneRefreshBtn);
-          actionsDiv.appendChild(editBtn);
-          actionsDiv.appendChild(delBtn);
-          tdActions.appendChild(actionsDiv);
-
-          tr.appendChild(tdClient);
-          tr.appendChild(tdStock);
-          tr.appendChild(tdSymbol);
-          tr.appendChild(tdQty);
-          tr.appendChild(tdCost);
-          tr.appendChild(tdSL);
-          tr.appendChild(tdTP);
-          tr.appendChild(tdCur);
-          tr.appendChild(tdVal);
-          tr.appendChild(tdPnl);
-          tr.appendChild(tdRate);
-          tr.appendChild(tdActions);
-
-          tableBody.appendChild(tr);
-        });
-      });
-    }
-
-    function renderAll() {
-      renderSummary();
-      renderTable();
-    }
-
-    function resetForm() {
-      editIdInput.value = "";
-      submitLabel.textContent = "保存持仓";
-      form.reset();
-    }
-
-    function startEdit(id) {
-      const h = holdings.find(x => x.id === id);
-      if (!h) return;
-      editIdInput.value = h.id;
-      clientInput.value = h.client;
-      stockNameInput.value = h.stockName;
-      symbolInput.value = h.symbol;
-      quantityInput.value = h.quantity;
-      costInput.value = h.cost;
-      stopLossInput.value = h.stopLoss ?? "";
-      takeProfitInput.value = h.takeProfit ?? "";
-      submitLabel.textContent = "保存修改";
-    }
-
-    function deleteHolding(id) {
-      if (!confirm("确定删除该条持仓记录吗？")) return;
-      holdings = holdings.filter(h => h.id !== id);
-      saveHoldings();
-      resetForm();
-    }
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const client = clientInput.value.trim();
-      const stockName = stockNameInput.value.trim();
-      const symbol = symbolInput.value.trim();
-      const quantity = Number(quantityInput.value);
-      const cost = Number(costInput.value);
-      const stopLoss = stopLossInput.value ? Number(stopLossInput.value) : null;
-      const takeProfit = takeProfitInput.value ? Number(takeProfitInput.value) : null;
-
-      if (!client || !stockName || !symbol || !quantity || !cost) {
-        alert("请完整填写必填项。");
-        return;
-      }
-
-      const id = editIdInput.value;
-      if (id) {
-        const idx = holdings.findIndex(h => h.id === id);
-        if (idx >= 0) {
-          holdings[idx] = {
-            ...holdings[idx],
-            client, stockName, symbol,
-            quantity, cost, stopLoss, takeProfit
-          };
-        }
-      } else {
-        holdings.push({
-          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-          client,
-          stockName,
-          symbol,
-          quantity,
-          cost,
-          stopLoss,
-          takeProfit,
-          currentPrice: null,
-          updatedAt: null
-        });
-      }
-      saveHoldings();
-      resetForm();
-    });
-
-    resetBtn.addEventListener("click", () => {
-      resetForm();
-    });
-
-    clearAllBtn.addEventListener("click", () => {
-      if (!confirm("确定清空本机所有持仓记录吗？")) return;
-      holdings = [];
-      saveHoldings();
-      resetForm();
-    });
-
-    function setAutoRefresh(on) {
-      if (autoTimer) {
-        clearInterval(autoTimer);
-        autoTimer = null;
-      }
-      if (on) {
-        const sec = Number(intervalSelect.value) || 60;
-        autoTimer = setInterval(() => {
-          if (holdings.length) refreshPrices();
-        }, sec * 1000);
-      }
-    }
-
-    autoToggle.addEventListener("change", () => {
-      setAutoRefresh(autoToggle.checked);
-      if (autoToggle.checked && holdings.length) {
-        refreshPrices();
-      }
-    });
-
-    intervalSelect.addEventListener("change", () => {
-      if (autoToggle.checked) setAutoRefresh(true);
-    });
-
-    refreshBtn.addEventListener("click", () => {
-      refreshPrices();
-    });
-
-    // 批量刷新行情（后端 /api/prices 使用 Naver）
-    async function refreshPrices(symbolsOverride) {
-      if (!holdings.length && !symbolsOverride) return;
-
-      let symbols;
-      if (symbolsOverride && symbolsOverride.length) {
-        symbols = Array.from(new Set(symbolsOverride));
-      } else {
-        symbols = Array.from(new Set(holdings.map(h => h.symbol)));
-      }
-
-      try {
-        const res = await fetch("/api/prices", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ symbols })
-        });
-        if (!res.ok) {
-          console.error("行情刷新失败:", await res.text());
-          return;
-        }
-        const data = await res.json();
-        const now = new Date().toISOString();
-
-        holdings.forEach(h => {
-          const info = data[h.symbol] || data[h.symbol.toUpperCase()];
-          if (info && info.ok) {
-            h.currentPrice = Number(info.price);
-            h.updatedAt = now;
-          }
-        });
-        saveHoldings();
-      } catch (e) {
-        console.error("刷新行情异常:", e);
-      }
-    }
-
-    exportBtn.addEventListener("click", () => {
-      if (!holdings.length) {
-        alert("当前没有任何持仓记录可导出。");
-        return;
-      }
-      const rows = [];
-      rows.push([
-        "客户",
-        "股票",
-        "代码",
-        "数量",
-        "成本价",
-        "现价",
-        "市值",
-        "盈亏",
-        "收益率(%)",
-        "止损",
-        "止盈",
-        "更新时间"
-      ]);
-
-      holdings.forEach(h => {
-        const qty = Number(h.quantity) || 0;
-        const cost = Number(h.cost) || 0;
-        const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
-        const val = qty * cur;
-        const pnl = val - qty * cost;
-        const rate = qty * cost > 0 ? (pnl / (qty * cost)) * 100 : 0;
-
-        rows.push([
-          h.client,
-          h.stockName,
-          h.symbol,
-          qty,
-          cost,
-          cur,
-          val,
-          pnl,
-          rate.toFixed(2),
-          h.stopLoss ?? "",
-          h.takeProfit ?? "",
-          h.updatedAt ? new Date(h.updatedAt).toLocaleString("zh-CN") : ""
-        ]);
-      });
-
-      rows.push([]);
-      rows.push(["=== 按客户汇总 ==="]);
-      const groups = groupByClient(holdings);
-      Object.keys(groups).forEach(name => {
-        const list = groups[name];
-        let costSum = 0, valSum = 0;
-        list.forEach(h => {
-          const qty = Number(h.quantity) || 0;
-          const cost = Number(h.cost) || 0;
-          const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
-          costSum += qty * cost;
-          valSum += qty * cur;
-        });
-        const pnl = valSum - costSum;
-        const rate = costSum > 0 ? (pnl / costSum) * 100 : 0;
-        rows.push([
-          name,
-          "",
-          "",
-          "",
-          "",
-          "",
-          valSum,
-          pnl,
-          rate.toFixed(2)
-        ]);
-      });
-
-      const csv = rows
-        .map(r => r.map(x => `"${String(x).replace(/"/g,'""')}"`).join(","))
-        .join("\r\n");
-
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      const now = new Date();
-      const y = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2,"0");
-      const d = String(now.getDate()).padStart(2,"0");
-      a.href = url;
-      a.download = `korea_portfolio_daily_${y}${m}${d}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
-
-    loadHoldings();
-    renderAll();
-  </script>
-</body>
-</html>
+    </heade
