@@ -199,6 +199,13 @@
       border-radius: 12px;
       background: #f9fafb;
       border: 1px solid #e5e7eb;
+      transition: background .15s, border-color .15s, box-shadow .15s;
+    }
+    /* 有推荐股的客户卡片：蓝色高亮 */
+    .summary-item.follow-card {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      box-shadow: 0 0 0 1px rgba(129,140,248,0.5);
     }
     .summary-header {
       display: flex;
@@ -396,36 +403,50 @@
 
     /* ==== 客户档案弹窗专用：更大 + 更“挤” ==== */
     .profile-modal .modal-inner {
-      max-width: 640px;      /* 宽一点 */
-      padding: 12px 14px;    /* 边距适中 */
+      max-width: 640px;
+      padding: 12px 14px;
     }
     .profile-modal .modal-body {
-      max-height: 430px;     /* 高一点，少滚动 */
+      max-height: 430px;
       padding-top: 4px;
       margin-top: 2px;
     }
-    /* 表单整体几乎没有多余空白 */
     .profile-form {
       display: flex;
       flex-direction: column;
-      gap: 2px;              /* 模块之间最小间距 */
+      gap: 2px;
     }
     .profile-form .row {
-      margin-top: 1px;       /* 行之间几乎贴在一起 */
+      margin-top: 1px;
       gap: 6px;
     }
     .profile-form label {
-      margin-bottom: 0;      /* label 紧贴输入框 */
+      margin-bottom: 0;
     }
     .profile-form input,
     .profile-form select,
     .profile-form textarea {
       font-size: 12px;
-      padding: 3px 6px;      /* 输入框高度进一步减小 */
+      padding: 3px 6px;
     }
     #profileClientNameLabel {
       margin-bottom: 2px !important;
     }
+
+    /* 推荐股的股票单元格：蓝色高亮 */
+    .stock-recommend-cell {
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-weight: 600;
+      border-radius: 999px;
+      padding: 2px 8px;
+      display: inline-block;
+    }
+/* 推荐股整行蓝色高亮 */
+.recommend-row {
+  background: #e8f0ff !important;
+}
+
   </style>
 </head>
 <body>
@@ -464,6 +485,12 @@
 
           <label style="margin-top:8px;">证券代码（可带 .KS / .KQ）</label>
           <input id="symbol" placeholder="例如：005930.KS / 323990.KQ" required />
+
+          <label style="margin-top:8px;">是否为推荐股</label>
+          <select id="isRecommend">
+            <option value="否" selected>否</option>
+            <option value="是">是</option>
+          </select>
 
           <div class="row" style="margin-top:8px;">
             <div>
@@ -581,7 +608,7 @@
       </div>
     </div>
 
-    <!-- 客户档案弹窗 -->
+    <!-- 客户档案弹窗（不再包含“是否跟票”字段） -->
     <div id="profileBackdrop" class="modal-backdrop"></div>
     <div id="profileModal" class="modal profile-modal" style="display:none;">
       <div class="modal-inner">
@@ -663,6 +690,7 @@
     const clientInput = document.getElementById("client");
     const stockNameInput = document.getElementById("stockName");
     const symbolInput = document.getElementById("symbol");
+    const isRecommendInput = document.getElementById("isRecommend");
     const quantityInput = document.getElementById("quantity");
     const costInput = document.getElementById("cost");
     const stopLossInput = document.getElementById("stopLoss");
@@ -967,8 +995,12 @@
         if (profile && profile.age) basicInfoParts.push(`${profile.age}岁`);
         const basicInfoText = basicInfoParts.join(" · ");
 
+        // 只要该客户有任何一只推荐股，卡片就高亮
+        const hasRecommend = list.some(h => h.isRecommend);
+
         const card = document.createElement("div");
-        card.className = "summary-item";
+        card.className = "summary-item" + (hasRecommend ? " follow-card" : "");
+
         const rateClass = pnl > 0 ? "positive" : pnl < 0 ? "negative" : "";
         const pnlClass = pnl > 0 ? "summary-value positive" :
                          pnl < 0 ? "summary-value negative" : "summary-value";
@@ -1056,6 +1088,11 @@
           const rate = qty * cost > 0 ? (pnl / (qty * cost)) * 100 : 0;
 
           const tr = document.createElement("tr");
+/* 推荐股整行蓝色 */
+if (h.isRecommend) {
+  tr.classList.add("recommend-row");
+}
+
           if (h.currentPrice != null) {
             const cp = Number(h.currentPrice);
             if (h.stopLoss && cp <= Number(h.stopLoss)) tr.style.background = "#fee2e2";
@@ -1068,7 +1105,14 @@
 
           const tdStock = document.createElement("td");
           tdStock.className = "t-left";
-          tdStock.textContent = h.stockName;
+          const stockSpan = document.createElement("span");
+          if (h.isRecommend) {
+            stockSpan.className = "stock-recommend-cell";
+            stockSpan.textContent = h.stockName;
+          } else {
+            stockSpan.textContent = h.stockName;
+          }
+          tdStock.appendChild(stockSpan);
 
           const tdSymbol = document.createElement("td");
           tdSymbol.textContent = h.symbol;
@@ -1168,6 +1212,7 @@
       editIdInput.value = "";
       submitLabel.textContent = "保存持仓";
       form.reset();
+      isRecommendInput.value = "否";
     }
 
     function startEdit(id) {
@@ -1177,6 +1222,7 @@
       clientInput.value = h.client;
       stockNameInput.value = h.stockName;
       symbolInput.value = h.symbol;
+      isRecommendInput.value = h.isRecommend ? "是" : "否";
       quantityInput.value = h.quantity;
       costInput.value = h.cost;
       stopLossInput.value = h.stopLoss ?? "";
@@ -1198,6 +1244,7 @@
       const symbol = symbolInput.value.trim();
       const quantity = Number(quantityInput.value);
       const cost = Number(costInput.value);
+      const isRecommend = isRecommendInput.value === "是";
       const stopLoss = stopLossInput.value ? Number(stopLossInput.value) : null;
       const takeProfit = takeProfitInput.value ? Number(takeProfitInput.value) : null;
 
@@ -1210,7 +1257,17 @@
       if (id) {
         const idx = holdings.findIndex(h => h.id === id);
         if (idx >= 0) {
-          holdings[idx] = { ...holdings[idx], client, stockName, symbol, quantity, cost, stopLoss, takeProfit };
+          holdings[idx] = {
+            ...holdings[idx],
+            client,
+            stockName,
+            symbol,
+            quantity,
+            cost,
+            stopLoss,
+            takeProfit,
+            isRecommend
+          };
         }
       } else {
         holdings.push({
@@ -1222,6 +1279,7 @@
           cost,
           stopLoss,
           takeProfit,
+          isRecommend,
           currentPrice: null,
           updatedAt: null
         });
@@ -1308,7 +1366,7 @@
       }
       const rows = [];
       rows.push([
-        "客户","股票","代码","数量","成本价","现价","市值","盈亏",
+        "客户","股票","是否推荐股","代码","数量","成本价","现价","市值","盈亏",
         "收益率(%)","止损","止盈","更新时间"
       ]);
 
@@ -1323,6 +1381,7 @@
         rows.push([
           h.client,
           h.stockName,
+          h.isRecommend ? "是" : "否",
           h.symbol,
           qty,
           cost,
@@ -1375,6 +1434,13 @@
 
     loadHoldings();
     loadProfiles();
+
+    /* 兼容旧数据：没有 isRecommend 字段时默认 false */
+    holdings = holdings.map(h => ({
+      isRecommend: false,
+      ...h
+    }));
+
     renderAll();
   </script>
 </body>
