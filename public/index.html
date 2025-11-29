@@ -94,7 +94,7 @@
       color: #4b5563;
       margin-bottom: 4px;
     }
-    input, select {
+    input, select, textarea {
       width: 100%;
       border-radius: 9px;
       border: 1px solid #d1d5db;
@@ -104,8 +104,9 @@
       padding: 7px 10px;
       outline: none;
       transition: border-color .15s, box-shadow .15s, background .15s;
+      resize: vertical;
     }
-    input:focus, select:focus {
+    input:focus, select:focus, textarea:focus {
       border-color: #2563eb;
       box-shadow: 0 0 0 1px rgba(37,99,235,0.25);
       background: #ffffff;
@@ -323,7 +324,7 @@
       text-align: right;
     }
 
-    /* ==== AI 解析弹窗 ==== */
+    /* ==== 弹窗通用 ==== */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -392,6 +393,39 @@
       border-color: #c7d2fe;
       background: #e0e7ff;
     }
+
+    /* ==== 客户档案弹窗专用：更大 + 更“挤” ==== */
+    .profile-modal .modal-inner {
+      max-width: 640px;      /* 宽一点 */
+      padding: 12px 14px;    /* 边距适中 */
+    }
+    .profile-modal .modal-body {
+      max-height: 430px;     /* 高一点，少滚动 */
+      padding-top: 4px;
+      margin-top: 2px;
+    }
+    /* 表单整体几乎没有多余空白 */
+    .profile-form {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;              /* 模块之间最小间距 */
+    }
+    .profile-form .row {
+      margin-top: 1px;       /* 行之间几乎贴在一起 */
+      gap: 6px;
+    }
+    .profile-form label {
+      margin-bottom: 0;      /* label 紧贴输入框 */
+    }
+    .profile-form input,
+    .profile-form select,
+    .profile-form textarea {
+      font-size: 12px;
+      padding: 3px 6px;      /* 输入框高度进一步减小 */
+    }
+    #profileClientNameLabel {
+      margin-bottom: 2px !important;
+    }
   </style>
 </head>
 <body>
@@ -412,7 +446,7 @@
     </header>
 
     <main class="grid">
-      <!-- 左侧：新增 / 编辑持仓 -->
+      <!-- 左侧：新增 / 修改持仓 -->
       <section class="card">
         <div class="card-title">
           新增 / 修改持仓
@@ -475,7 +509,7 @@
         <div class="card-title">
           持仓概览 · 实时报价
           <span>
-            <span class="tag-alert">每位客户单独汇总 · 自动刷新 Naver 行情</span>
+            <span class="tag-alert">每位客户单独汇总 · 自动刷新 Naver 行情 · 支持查看 / 编辑客户详细档案</span>
           </span>
         </div>
 
@@ -542,7 +576,79 @@
         </div>
         <div id="aiModalContent" class="modal-body"></div>
         <div class="modal-footer">
-          以上内容为程序根据当前持仓自动生成，仅供参考，不构成投资建议。
+          以上内容为程序根据当前持仓与客户档案自动生成，仅供参考，不构成投资建议。
+        </div>
+      </div>
+    </div>
+
+    <!-- 客户档案弹窗 -->
+    <div id="profileBackdrop" class="modal-backdrop"></div>
+    <div id="profileModal" class="modal profile-modal" style="display:none;">
+      <div class="modal-inner">
+        <div class="modal-header">
+          <div id="profileModalTitle" class="modal-title">客户档案</div>
+          <button type="button" id="profileModalClose" class="btn-ghost btn-sm">关闭</button>
+        </div>
+        <div id="profileModalContent" class="modal-body">
+          <form id="profileForm" class="profile-form">
+            <div id="profileClientNameLabel" style="font-size:12px;color:#4b5563;">
+              客户：-
+            </div>
+
+            <div class="row">
+              <div>
+                <label>性别</label>
+                <select id="profileGender">
+                  <option value="">未填写</option>
+                  <option value="男">男</option>
+                  <option value="女">女</option>
+                  <option value="其他">其他</option>
+                </select>
+              </div>
+              <div>
+                <label>年龄（岁）</label>
+                <input id="profileAge" type="number" min="0" step="1" placeholder="例如：46" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label>股龄 / 投资时间</label>
+                <input id="profileStockAge" placeholder="例如：新手 / 2年" />
+              </div>
+              <div>
+                <label>炒股操作方式</label>
+                <input id="profileStyle" placeholder="例如：短线 / 波段 / 长线" />
+              </div>
+            </div>
+
+            <div>
+              <label>投资偏好</label>
+              <input id="profilePreference" placeholder="例如：AI / 生物医药 / 半导体 / 高股息等" />
+            </div>
+
+            <div>
+              <label>兴趣爱好</label>
+              <input id="profileHobby" placeholder="例如：足球 / 旅游 / 摄影等" />
+            </div>
+
+            <div>
+              <label>家庭情况</label>
+              <input id="profileFamily" placeholder="例如：已婚三个孩子 / 独居等" />
+            </div>
+
+            <div>
+              <label>备注（选填）</label>
+              <textarea id="profileNote" rows="2" placeholder="风险承受能力、职业、收入稳定性等"></textarea>
+            </div>
+
+            <div style="margin-top:4px; text-align:right;">
+              <button type="submit" class="btn btn-secondary btn-sm">保存档案</button>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          客户档案信息仅保存在本机浏览器中，用于日常沟通与投资偏好管理。
         </div>
       </div>
     </div>
@@ -550,6 +656,7 @@
 
   <script>
     const STORAGE_KEY = "korea_portfolio_tracker_v1";
+    const PROFILE_STORAGE_KEY = "korea_client_profiles_v1";
 
     const form = document.getElementById("holdForm");
     const editIdInput = document.getElementById("editId");
@@ -571,7 +678,21 @@
     const submitLabel = document.getElementById("submitLabel");
     const summaryContainer = document.getElementById("summaryContainer");
 
-    // AI 弹窗相关 DOM
+    const profileBackdrop = document.getElementById("profileBackdrop");
+    const profileModal = document.getElementById("profileModal");
+    const profileModalTitle = document.getElementById("profileModalTitle");
+    const profileModalClose = document.getElementById("profileModalClose");
+    const profileForm = document.getElementById("profileForm");
+    const profileClientNameLabel = document.getElementById("profileClientNameLabel");
+    const profileGenderInput = document.getElementById("profileGender");
+    const profileAgeInput = document.getElementById("profileAge");
+    const profileStockAgeInput = document.getElementById("profileStockAge");
+    const profileStyleInput = document.getElementById("profileStyle");
+    const profilePreferenceInput = document.getElementById("profilePreference");
+    const profileHobbyInput = document.getElementById("profileHobby");
+    const profileFamilyInput = document.getElementById("profileFamily");
+    const profileNoteInput = document.getElementById("profileNote");
+
     const aiBackdrop = document.getElementById("aiBackdrop");
     const aiModal = document.getElementById("aiModal");
     const aiModalTitle = document.getElementById("aiModalTitle");
@@ -579,13 +700,15 @@
     const aiModalClose = document.getElementById("aiModalClose");
 
     let holdings = [];
+    let clientProfiles = {};
     let autoTimer = null;
+    let currentProfileClientName = null;
 
     function loadHoldings() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         holdings = raw ? JSON.parse(raw) : [];
-      } catch (e) {
+      } catch {
         holdings = [];
       }
     }
@@ -593,6 +716,25 @@
     function saveHoldings() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(holdings));
       renderAll();
+    }
+
+    function loadProfiles() {
+      try {
+        const raw = localStorage.getItem(PROFILE_STORAGE_KEY);
+        clientProfiles = raw ? JSON.parse(raw) : {};
+      } catch {
+        clientProfiles = {};
+      }
+    }
+
+    function saveProfiles() {
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(clientProfiles));
+      renderSummary();
+    }
+
+    function getProfile(name) {
+      if (!name) return null;
+      return clientProfiles && clientProfiles[name] ? clientProfiles[name] : null;
     }
 
     function formatNumber(n) {
@@ -603,8 +745,7 @@
       const n = Number(v);
       if (!isFinite(n)) return "0.00%";
       const s = n.toFixed(2) + "%";
-      if (n > 0) return "+" + s;
-      return s;
+      return n > 0 ? "+" + s : s;
     }
 
     function groupByClient(list) {
@@ -617,102 +758,124 @@
       return map;
     }
 
-    // === AI 弹窗 ===
     function openAiModal(title, content) {
       aiModalTitle.textContent = title;
       aiModalContent.textContent = content;
       aiBackdrop.style.display = "block";
       aiModal.style.display = "flex";
     }
-
     function closeAiModal() {
       aiBackdrop.style.display = "none";
       aiModal.style.display = "none";
     }
-
     aiBackdrop.addEventListener("click", closeAiModal);
     aiModalClose.addEventListener("click", closeAiModal);
 
-    // 单只股票解析（精简专业版 + 客户短句）
+    function openProfileModal(clientName) {
+      currentProfileClientName = clientName;
+      profileModalTitle.textContent = `${clientName} · 客户档案`;
+      profileClientNameLabel.textContent = `客户：${clientName}`;
+
+      const p = getProfile(clientName) || {};
+      profileGenderInput.value = p.gender || "";
+      profileAgeInput.value = p.age !== undefined && p.age !== null ? p.age : "";
+      profileStockAgeInput.value = p.stockAge || "";
+      profileStyleInput.value = p.style || "";
+      profilePreferenceInput.value = p.preference || "";
+      profileHobbyInput.value = p.hobby || "";
+      profileFamilyInput.value = p.family || "";
+      profileNoteInput.value = p.note || "";
+
+      profileBackdrop.style.display = "block";
+      profileModal.style.display = "flex";
+    }
+    function closeProfileModal() {
+      profileBackdrop.style.display = "none";
+      profileModal.style.display = "none";
+      currentProfileClientName = null;
+    }
+    profileBackdrop.addEventListener("click", closeProfileModal);
+    profileModalClose.addEventListener("click", closeProfileModal);
+
+    profileForm.addEventListener("submit", e => {
+      e.preventDefault();
+      if (!currentProfileClientName) {
+        alert("未识别到客户姓名，无法保存档案。");
+        return;
+      }
+      const name = currentProfileClientName;
+      const profile = {
+        gender: profileGenderInput.value || "",
+        age: profileAgeInput.value ? Number(profileAgeInput.value) : "",
+        stockAge: profileStockAgeInput.value || "",
+        style: profileStyleInput.value || "",
+        preference: profilePreferenceInput.value || "",
+        hobby: profileHobbyInput.value || "",
+        family: profileFamilyInput.value || "",
+        note: profileNoteInput.value || ""
+      };
+      clientProfiles[name] = profile;
+      saveProfiles();
+      alert("客户档案已保存 / 更新。");
+      closeProfileModal();
+    });
+
     function generateHoldingAdvice(h) {
       const qty = Number(h.quantity) || 0;
       const cost = Number(h.cost) || 0;
       const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
       const pnl = (cur - cost) * qty;
-      const rate = qty * cost > 0 ? ((pnl / (qty * cost)) * 100) : 0;
+      const rate = qty * cost > 0 ? (pnl / (qty * cost)) * 100 : 0;
       const stopLoss = h.stopLoss ? Number(h.stopLoss) : null;
       const takeProfit = h.takeProfit ? Number(h.takeProfit) : null;
+      const profile = getProfile(h.client);
 
       let msg = `【${h.stockName}｜${h.symbol}】\n`;
-
-      // 盈亏 & 趋势结论
       if (rate >= 12) msg += `短线趋势偏强，获利区间较好。`;
       else if (rate >= 3) msg += `仍属健康震荡，中期向上概率偏大。`;
       else if (rate > -6) msg += `围绕成本来回震荡，方向暂未走出来。`;
       else if (rate > -15) msg += `出现明显回撤，趋势偏弱，情绪略谨慎。`;
       else msg += `处于深度回撤区间，短期反弹难度较大，需格外谨慎。`;
 
-      // 板块 / 情绪 / 成交量 / 资金维度
       msg += ` 当前走势的关键在：①板块整体情绪是否配合，②能否放量突破关键价位，③主力/机构资金是否持续回流。`;
 
-      // 实战操作建议（止盈/止损/仓位）
-      if (rate >= 12) {
-        msg += ` 建议以分批落袋为主，适当降低仓位，既保住利润又保留部分仓位跟随趋势。`;
-      } else if (rate >= 3) {
-        msg += ` 可继续持有，重点观察放量突破前高的力度，不宜追高加仓，必要时高位减一部分锁定收益。`;
-      } else if (rate > -6) {
-        msg += ` 暂不建议频繁操作，等出现放量突破或跌破关键支撑后再决定是顺势加仓还是果断减仓。`;
-      } else if (rate > -15) {
-        msg += ` 建议先适度减仓，把整体仓位压下来，等待情绪修复或放量企稳后再考虑重新布局。`;
-      } else {
-        msg += ` 建议以风险控制为先，利用反弹分批退出，把资金转向确定性更高、流动性更好的标的。`;
-      }
+      if (rate >= 12) msg += ` 建议以分批落袋为主，适当降低仓位，既保住利润又保留部分仓位跟随趋势。`;
+      else if (rate >= 3) msg += ` 可继续持有，重点观察放量突破前高的力度，不宜追高加仓，必要时高位减一部分锁定收益。`;
+      else if (rate > -6) msg += ` 暂不建议频繁操作，等出现放量突破或跌破关键支撑后再决定是顺势加仓还是果断减仓。`;
+      else if (rate > -15) msg += ` 建议先适度减仓，把整体仓位压下来，等待情绪修复或放量企稳后再考虑重新布局。`;
+      else msg += ` 建议以风险控制为先，利用反弹分批退出，把资金转向确定性更高、流动性更好的标的。`;
 
-      // 止盈 / 止损提醒
-      if (takeProfit && cur >= takeProfit) {
-        msg += ` 目前价格已处在或接近预设止盈区间，可按原计划分批兑现利润。`;
-      }
-      if (stopLoss && cur <= stopLoss) {
-        msg += ` 已接近或跌破止损线，建议优先考虑执行止损纪律，避免亏损进一步扩大。`;
-      }
+      if (takeProfit && cur >= takeProfit) msg += ` 目前价格已处在或接近预设止盈区间，可按原计划分批兑现利润。`;
+      if (stopLoss && cur <= stopLoss) msg += ` 已接近或跌破止损线，建议优先考虑执行止损纪律，避免亏损进一步扩大。`;
 
-      // 补仓判断
-      if (rate <= 0) {
-        msg += ` 在趋势尚未重新走强前，不建议补仓，避免越补越深。`;
-      } else {
-        msg += ` 如后续回踩支撑且成交量缩量，价格企稳后可以小仓位低吸补一点，但不宜大幅加码。`;
-      }
+      if (rate <= 0) msg += ` 在趋势尚未重新走强前，不建议补仓，避免越补越深。`;
+      else msg += ` 如后续回踩支撑且成交量缩量，价格企稳后可以小仓位低吸补一点，但不宜大幅加码。`;
 
-      // 后市关键点
       msg += ` 后续重点看是否“放量突破而不是放量滞涨”，突破可以顺势多看一段，若放量不上涨则应以落袋和减仓为主。`;
 
-      // 激励语气（按盈亏区间）
-      if (rate >= 8) {
-        msg += ` 当前整体节奏把握得不错，接下来主要是控制回撤，把账面盈利尽量转成已实现收益。`;
-      } else if (rate >= -5) {
-        msg += ` 目前属于正常波动范围，关键在于耐心等待方向，不急于做过多动作。`;
-      } else {
-        msg += ` 现在最重要的是稳住仓位和情绪，把风险控制在自己能接受的范围内，比盲目“解套”更重要。`;
+      if (profile) {
+        const parts = [];
+        if (profile.stockAge) parts.push(`股龄约 ${profile.stockAge}`);
+        if (profile.style) parts.push(`操作风格偏「${profile.style}」`);
+        if (profile.preference) parts.push(`偏好 ${profile.preference}`);
+        if (parts.length) msg += `\n\n🔎 结合客户画像：${parts.join("，")}。后续沟通时可根据他的节奏和偏好，把重心放在“仓位控制 + 主线机会”上。`;
+        if (profile.family) msg += ` 家庭情况：${profile.family}，适合强调“尽量用闲钱投资、把已到手盈利落实到口袋”，控制回撤，避免给生活资金带来压力。`;
       }
 
-      // 给客户的短句话术
+      if (rate >= 8) msg += ` 当前整体节奏把握得不错，接下来主要是控制回撤，把账面盈利尽量转成已实现收益。`;
+      else if (rate >= -5) msg += ` 目前属于正常波动范围，关键在于耐心等待方向，不急于做过多动作。`;
+      else msg += ` 现在最重要的是稳住仓位和情绪，把风险控制在自己能接受的范围内，比盲目“解套”更重要。`;
+
       let short = "";
-      if (rate >= 8) {
-        short = `现在这笔仓位盈利不错，建议您分批锁定一部分收益，剩余仓位我们再顺势看一看即可。`;
-      } else if (rate >= 0) {
-        short = `目前整体处于正常震荡，先观察是否能放量突破，等方向更清晰后再一起调整。`;
-      } else if (rate > -10) {
-        short = `这笔仓位有一定回撤，建议先把仓位适当降一下，等情绪和走势稳定后，我们再考虑下一步。`;
-      } else {
-        short = `目前跌幅偏大，后面反弹我们会分批往外腾一部分仓位，尽量把损失控制住，再换到更有把握的机会。`;
-      }
+      if (rate >= 8) short = `现在这笔仓位盈利不错，建议您分批锁定一部分收益，剩余仓位我们再顺势看一看即可。`;
+      else if (rate >= 0) short = `目前整体处于正常震荡，先观察是否能放量突破，等方向更清晰后我们再一起调整。`;
+      else if (rate > -10) short = `这笔仓位有一定回撤，建议先把仓位适当降一下，等情绪和走势稳定后，我们再考虑下一步。`;
+      else short = `目前跌幅偏大，后面反弹我们会分批往外腾一部分仓位，尽量把损失控制住，再换到更有把握的机会。`;
 
       msg += `\n\n📌 给客户的发送话术：\n${short}`;
-
       return msg;
     }
 
-    // 单个客户整体持仓解析（精简专业版 + 客户短句）
     function generateClientAdvice(clientName, list) {
       let totalCost = 0, totalValue = 0;
       list.forEach(h => {
@@ -724,16 +887,14 @@
       });
       const pnl = totalValue - totalCost;
       const rate = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
+      const profile = getProfile(clientName);
 
       let msg = `【${clientName} · 持仓整体点评】\n`;
-
-      // 组合总体状态
       if (rate >= 10) msg += `整体盈利表现不错，节奏和选股方向都基本站得住。`;
       else if (rate >= 0) msg += `整体处于小幅盈亏震荡阶段，仓位风险可控，但结构还有优化空间。`;
       else if (rate > -10) msg += `组合出现一定回撤，但整体仍在可管理区间，主要问题在持仓结构和节奏。`;
       else msg += `目前组合回撤偏大，需要先把风险降下来，再考虑后续机会。`;
 
-      // 找出最大权重标的
       const sorted = [...list].map(h => {
         const qty = Number(h.quantity) || 0;
         const cost = Number(h.cost) || 0;
@@ -747,47 +908,38 @@
         msg += ` 目前权重最高的是 ${top.stockName}（${top.symbol}），约占组合市值的 ${weight.toFixed(1)}%，它的走势会对整体净值影响比较大，需要重点盯一下成交量和板块情绪。`;
       }
 
-      // 操作方向 & 风险控制
-      if (rate >= 8) {
-        msg += ` 后续建议把涨幅大、波动大的标的适当减仓，锁定一部分盈利，同时把资金向确定性更高、基本面更清晰的主线集中。`;
-      } else if (rate >= 0) {
-        msg += ` 建议减少边缘题材和成交量偏弱的个股仓位，把仓位更多放在流动性好、趋势明确的核心品种上。`;
-      } else {
-        msg += ` 建议先清理亏损较重、逻辑不再清晰或流动性较差的持仓，把整体仓位降下来，让组合先处在一个自己舒服的风险水平。`;
-      }
+      if (rate >= 8) msg += ` 后续建议把涨幅大、波动大的标的适当减仓，锁定一部分盈利，同时把资金向确定性更高、基本面更清晰的主线集中。`;
+      else if (rate >= 0) msg += ` 建议减少边缘题材和成交量偏弱的个股仓位，把仓位更多放在流动性好、趋势明确的核心品种上。`;
+      else msg += ` 建议先清理亏损较重、逻辑不再清晰或流动性较差的持仓，把整体仓位降下来，让组合先处在一个自己舒服的风险水平。`;
 
       msg += ` 后市关键仍在于：大盘和主流板块的情绪能否企稳、成交量能否放大，以及资金是否继续向您持有的主线方向集中。`;
 
-      // 激励语气
-      if (rate >= 6) {
-        msg += ` 整体来说这段时间的节奏是不错的，现在主要是边走边落袋，尽量别把到手的收益再吐回去。`;
-      } else if (rate >= -5) {
-        msg += ` 目前属于正常波动范围，通过一点点调仓换股把结构调顺，后面机会还是有的。`;
-      } else {
-        msg += ` 调整阶段很正常，关键是先稳住净值和心态，后面有更好的时机我们再慢慢把损失抢回来。`;
+      if (profile) {
+        const parts = [];
+        if (profile.stockAge) parts.push(`股龄约 ${profile.stockAge}`);
+        if (profile.style) parts.push(`偏好「${profile.style}」节奏`);
+        if (profile.preference) parts.push(`更关注 ${profile.preference}`);
+        if (parts.length) msg += `\n\n🔎 结合客户背景：${parts.join("，")}。整体调仓时可以把仓位节奏控制在他能舒服持有的区间，避免追涨杀跌。`;
+        if (profile.family) msg += ` 家庭方面：${profile.family}，适合把组合定位为“稳中有进”，在有盈利时多做分批落袋，把回撤控制在他心理可承受范围内。`;
       }
 
-      // 给客户的短句话术
+      if (rate >= 6) msg += ` 整体来说这段时间的节奏是不错的，现在主要是边走边落袋，尽量别把到手的收益再吐回去。`;
+      else if (rate >= -5) msg += ` 目前属于正常波动范围，通过一点点调仓换股把结构调顺，后面机会还是有的。`;
+      else msg += ` 调整阶段很正常，关键是先稳住净值和心态，后面有更好的时机我们再慢慢把损失抢回来。`;
+
       let short = "";
-      if (rate >= 6) {
-        short = `整体组合现在盈利还不错，接下来我们会边走边锁定收益，尽量把赚到的先装进口袋里。`;
-      } else if (rate >= 0) {
-        short = `目前整体在正常震荡区间，我们会帮您把弱势仓位慢慢换掉，把资金集中到更有把握的主线上。`;
-      } else {
-        short = `现在组合有一定回撤，接下来我们会优先把风险高、没什么把握的仓位降下来，等节奏稳住后再去找更好的机会。`;
-      }
+      if (rate >= 6) short = `整体组合现在盈利还不错，接下来我们会边走边锁定收益，尽量把赚到的先装进口袋里。`;
+      else if (rate >= 0) short = `目前整体在正常震荡区间，我们会帮您把弱势仓位慢慢换掉，把资金集中到更有把握的主线上。`;
+      else short = `现在组合有一定回撤，接下来我们会优先把风险高、没什么把握的仓位降下来，等节奏稳住后再去找更好的机会。`;
 
       msg += `\n\n📌 给客户的发送话术：\n${short}`;
-
       return msg;
     }
 
-    // 顶部汇总：每个客户一张卡片 + AI按钮
     function renderSummary() {
       summaryContainer.innerHTML = "";
       const groups = groupByClient(holdings);
       const clients = Object.keys(groups).sort();
-
       if (!clients.length) {
         summaryContainer.innerHTML =
           '<div class="summary-item"><div class="summary-client" style="font-size:12px;color:#6b7280;">暂无持仓记录</div></div>';
@@ -798,7 +950,6 @@
         const list = groups[clientName];
         let totalCost = 0;
         let totalValue = 0;
-
         list.forEach(h => {
           const qty = Number(h.quantity) || 0;
           const cost = Number(h.cost) || 0;
@@ -806,23 +957,32 @@
           totalCost += qty * cost;
           totalValue += qty * cur;
         });
-
         const pnl = totalValue - totalCost;
         const rate = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
 
+        const profile = getProfile(clientName);
+        const basicInfoParts = [];
+        if (profile && profile.gender) basicInfoParts.push(profile.gender);
+        if (profile && profile.stockAge) basicInfoParts.push(`股龄 ${profile.stockAge}`);
+        if (profile && profile.age) basicInfoParts.push(`${profile.age}岁`);
+        const basicInfoText = basicInfoParts.join(" · ");
+
         const card = document.createElement("div");
         card.className = "summary-item";
-
         const rateClass = pnl > 0 ? "positive" : pnl < 0 ? "negative" : "";
         const pnlClass = pnl > 0 ? "summary-value positive" :
-                         pnl < 0 ? "summary-value negative" :
-                         "summary-value";
+                         pnl < 0 ? "summary-value negative" : "summary-value";
 
         card.innerHTML = `
           <div class="summary-header">
             <div class="summary-client">${clientName}</div>
             <div class="summary-rate ${rateClass}">${formatPercent(rate)}</div>
           </div>
+          ${basicInfoText ? `
+          <div class="summary-line">
+            <span class="summary-label">基本信息</span>
+            <span>${basicInfoText}</span>
+          </div>` : ""}
           <div class="summary-line">
             <span class="summary-label">总投入成本</span>
             <span>₩ ${formatNumber(totalCost)}</span>
@@ -835,15 +995,18 @@
             <span class="summary-label">总盈亏</span>
             <span class="${pnlClass}">₩ ${formatNumber(pnl)}</span>
           </div>
-          <div class="summary-line" style="margin-top:4px; justify-content:flex-end;">
+          <div class="summary-line" style="margin-top:4px; justify-content:flex-end; gap:6px;">
+            <button type="button" class="btn-ghost btn-sm profile-detail-btn">📇 详细档案</button>
             <button type="button" class="btn-ai ai-client-btn">AI解析建议</button>
           </div>
         `;
 
-        const aiBtn = card.querySelector(".ai-client-btn");
-        aiBtn.addEventListener("click", () => {
+        card.querySelector(".ai-client-btn").addEventListener("click", () => {
           const text = generateClientAdvice(clientName, list);
           openAiModal(`${clientName} · 客户整体持仓解析`, text);
+        });
+        card.querySelector(".profile-detail-btn").addEventListener("click", () => {
+          openProfileModal(clientName);
         });
 
         summaryContainer.appendChild(card);
@@ -863,9 +1026,7 @@
 
       clients.forEach(clientName => {
         const list = groups[clientName];
-
-        let clientCost = 0;
-        let clientValue = 0;
+        let clientCost = 0, clientValue = 0;
         list.forEach(h => {
           const qty = Number(h.quantity) || 0;
           const cost = Number(h.cost) || 0;
@@ -895,14 +1056,10 @@
           const rate = qty * cost > 0 ? (pnl / (qty * cost)) * 100 : 0;
 
           const tr = document.createElement("tr");
-
           if (h.currentPrice != null) {
             const cp = Number(h.currentPrice);
-            if (h.stopLoss && cp <= Number(h.stopLoss)) {
-              tr.style.background = "#fee2e2";
-            } else if (h.takeProfit && cp >= Number(h.takeProfit)) {
-              tr.style.background = "#dcfce7";
-            }
+            if (h.stopLoss && cp <= Number(h.stopLoss)) tr.style.background = "#fee2e2";
+            else if (h.takeProfit && cp >= Number(h.takeProfit)) tr.style.background = "#dcfce7";
           }
 
           const tdClient = document.createElement("td");
@@ -941,9 +1098,7 @@
 
           const tdRate = document.createElement("td");
           const pill = document.createElement("span");
-          pill.className =
-            "pill " +
-            (rate > 0 ? "pill-gain" : rate < 0 ? "pill-loss" : "pill-neutral");
+          pill.className = "pill " + (rate > 0 ? "pill-gain" : rate < 0 ? "pill-loss" : "pill-neutral");
           pill.textContent = formatPercent(rate);
           tdRate.appendChild(pill);
 
@@ -1036,7 +1191,7 @@
       resetForm();
     }
 
-    form.addEventListener("submit", (e) => {
+    form.addEventListener("submit", e => {
       e.preventDefault();
       const client = clientInput.value.trim();
       const stockName = stockNameInput.value.trim();
@@ -1055,11 +1210,7 @@
       if (id) {
         const idx = holdings.findIndex(h => h.id === id);
         if (idx >= 0) {
-          holdings[idx] = {
-            ...holdings[idx],
-            client, stockName, symbol,
-            quantity, cost, stopLoss, takeProfit
-          };
+          holdings[idx] = { ...holdings[idx], client, stockName, symbol, quantity, cost, stopLoss, takeProfit };
         }
       } else {
         holdings.push({
@@ -1079,9 +1230,7 @@
       resetForm();
     });
 
-    resetBtn.addEventListener("click", () => {
-      resetForm();
-    });
+    resetBtn.addEventListener("click", resetForm);
 
     clearAllBtn.addEventListener("click", () => {
       if (!confirm("确定清空本机所有持仓记录吗？")) return;
@@ -1105,9 +1254,7 @@
 
     autoToggle.addEventListener("change", () => {
       setAutoRefresh(autoToggle.checked);
-      if (autoToggle.checked && holdings.length) {
-        refreshPrices();
-      }
+      if (autoToggle.checked && holdings.length) refreshPrices();
     });
 
     intervalSelect.addEventListener("change", () => {
@@ -1118,7 +1265,6 @@
       refreshPrices();
     });
 
-    // 批量刷新行情（后端 /api/prices 使用 Naver）
     async function refreshPrices(symbolsOverride) {
       if (!holdings.length && !symbolsOverride) return;
 
@@ -1162,18 +1308,8 @@
       }
       const rows = [];
       rows.push([
-        "客户",
-        "股票",
-        "代码",
-        "数量",
-        "成本价",
-        "现价",
-        "市值",
-        "盈亏",
-        "收益率(%)",
-        "止损",
-        "止盈",
-        "更新时间"
+        "客户","股票","代码","数量","成本价","现价","市值","盈亏",
+        "收益率(%)","止损","止盈","更新时间"
       ]);
 
       holdings.forEach(h => {
@@ -1215,17 +1351,7 @@
         });
         const pnl = valSum - costSum;
         const rate = costSum > 0 ? (pnl / costSum) * 100 : 0;
-        rows.push([
-          name,
-          "",
-          "",
-          "",
-          "",
-          "",
-          valSum,
-          pnl,
-          rate.toFixed(2)
-        ]);
+        rows.push([name,"","","","","",valSum,pnl,rate.toFixed(2)]);
       });
 
       const csv = rows
@@ -1248,6 +1374,7 @@
     });
 
     loadHoldings();
+    loadProfiles();
     renderAll();
   </script>
 </body>
