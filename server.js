@@ -1,132 +1,106 @@
+// server.js
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
-require("dotenv").config();
+const path = require("path");
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-// 静态托管前端界面
+// 静态托管前端
 app.use(express.static("public"));
 
-/* 工具：把 symbol 转成 Naver 六位纯数字代码 */
-function toNaverCode(raw) {
-  if (!raw) return null;
-  let s = String(raw).trim().toUpperCase();
-  s = s.replace(/\.(KS|KQ|KR)$/i, ""); // 去掉 .KS / .KQ
-  s = s.replace(/\D/g, ""); // 仅保留数字
-  if (!s) return null;
-  if (s.length < 6) s = s.padStart(6, "0");
-  return s;
-}
+/**
+ * 从 Naver 抓取韩股价格
+ * symbol 示例：'005930'、'338220'
+ */
+async function fetchKoreaPriceFromNaver(symbol) {
+  // 防止传入 '005930.KS' 之类，统一只保留数字
+  const code = String(symbol).match(/\d{6}/);
+  if (!code) {
+    throw new Error(`无效代码: ${symbol}`);
+  }
+  const stockCode = code[0];
 
-/* 访问 Naver */
-async function fetchNaverPrice(code) {
-  const url = `https://polling.finance.naver.com/api/realtime?query=SERVICE_ITEM:${code}`;
+  const url = `https://finance.naver.com/item/sise.nhn?code=${stockCode}`;
 
-  const resp = await axios.get(url, {
+  const { data: html } = await axios.get(url, {
     headers: {
+      // 带上 User-Agent，减少被 Naver 拦截的概率
       "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
-      Accept: "application/json, text/plain, */*",
-      Referer: "https://finance.naver.com/"
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+      Referer: "https://finance.naver.com/",
     },
-    timeout: 5000
+    responseType: "text",
+    transformResponse: [(d) => d], // 不要自动 JSON 解析
   });
 
-  const data = resp.data;
-  const areas = data?.result?.areas;
-  const first = areas?.[0]?.datas?.[0];
-
-  if (!first) throw new Error("Naver 返回中没有 datas 数据");
-
-  // 调试打印结构（只在首次失败时显示）
-  console.log("🔍 Naver 原始返回:", first);
-
-  // 逐字段匹配，避免 API 字段变化导致失败
-  let raw =
-    first.now ??
-    first.nv ??
-    first.cv ??
-    first.clpr ??
-    first.close ??
-    first.price ??
-    first.tradePrice ??
-    null;
-
-  if (typeof raw === "string") raw = Number(raw.replace(/,/g, ""));
-
-  if (typeof raw !== "number" || Number.isNaN(raw)) {
-    throw new Error("Naver 返回中未找到可解析的价格字段");
+  // 从 <p class="no_today">...</p> 里取第一个 <span class="blind">数字</span>
+  const blockMatch = html.match(
+    /<p\s+class="no_today"[^>]*>([\s\S]*?)<\/p>/
+  );
+  if (!blockMatch) {
+    throw new Error("未找到 no_today 区块（当前价）");
   }
 
-  return raw;
+  const block = blockMatch[1];
+  const priceMatch = block.match(/<span[^>]*class="blind"[^>]*>([\d,]+)<\/span>/);
+  if (!priceMatch) {
+    throw new Error("未在 no_today 中解析出价格");
+  }
+
+  const priceStr = priceMatch[1].replace(/,/g, "");
+  const price = Number(priceStr);
+
+  if (!isFinite(price) || price <= 0) {
+    throw new Error("解析出的价格无效: " + priceStr);
+  }
+
+  return price;
 }
 
-/* ▶ 单只股票价格（测试） */
-app.get("/api/price", async (req, res) => {
-  try {
-    const { symbol } = req.query;
-    if (!symbol) return res.status(400).json({ ok: false, error: "symbol 参数必填" });
-
-    const code = toNaverCode(symbol);
-    if (!code) return res.status(400).json({ ok: false, error: "symbol 格式无效" });
-
-    const price = await fetchNaverPrice(code);
-    return res.json({ ok: true, symbol, code, price });
-  } catch (err) {
-    console.error("❌ 单只行情失败:", err.message);
-    return res.status(500).json({ ok: false, error: err.message });
-  }
-});
-
-/* ▶ 批量行情（前端刷新行情使用） */
+/**
+ * 批量接口：POST /api/prices
+ * body: { symbols: ["005930","338220", ...] }
+ */
 app.post("/api/prices", async (req, res) => {
   try {
     const { symbols } = req.body;
     if (!Array.isArray(symbols) || symbols.length === 0) {
-      return res.status(400).json({ error: "symbols 必须是数组且不可为空" });
+      return res.status(400).json({ error: "symbols 必须是非空数组" });
     }
 
-    const symbolToCode = {};
-    symbols.forEach(sym => {
-      const c = toNaverCode(sym);
-      if (c) symbolToCode[sym] = c;
-    });
-
-    const uniqueCodes = [...new Set(Object.values(symbolToCode))];
-    const cache = {}; // 避免同一代码多次请求
-
-    await Promise.all(
-      uniqueCodes.map(async code => {
-        try {
-          const price = await fetchNaverPrice(code);
-          cache[code] = { ok: true, price };
-        } catch (err) {
-          cache[code] = { ok: false, error: err.message };
-          console.error("❌ 批量行情失败:", code, err.message);
-        }
-      })
-    );
-
     const result = {};
-    Object.entries(symbolToCode).forEach(([sym, code]) => {
-      result[sym] = { code, ...cache[code] };
-    });
 
-    return res.json(result);
+    // 顺序抓取，避免对 Naver 压力太大；数量不多的话足够用
+    for (const symbol of symbols) {
+      try {
+        const price = await fetchKoreaPriceFromNaver(symbol);
+        result[symbol] = { ok: true, price };
+      } catch (err) {
+        console.error(
+          "获取价格失败:",
+          symbol,
+          err.message || err.toString()
+        );
+        result[symbol] = { ok: false, error: err.message || "解析失败" };
+      }
+    }
+
+    res.json(result);
   } catch (err) {
-    console.error("🚨 批量行情接口异常:", err.message);
-    return res.status(500).json({ error: err.message });
+    console.error("批量价格接口异常:", err);
+    res.status(500).json({ error: "服务器错误" });
   }
 });
 
-/* ▶ 避免 Render 刷新页面 404 */
+// 兜底：所有其他路由都返回前端页面
 app.get("*", (req, res) => {
-  res.sendFile(__dirname + "/public/index.html");
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`✅ Server running at http://localhost:${PORT}`);
+});
