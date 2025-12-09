@@ -87,7 +87,7 @@
       color: #6b7280;
       margin-bottom: 4px;
     }
-    input {
+    input, select, textarea {
       width: 100%;
       border-radius: 9px;
       border: 1px solid #d1d5db;
@@ -96,8 +96,9 @@
       font-size: 13px;
       padding: 7px 10px;
       outline: none;
+      resize: vertical;
     }
-    input:focus {
+    input:focus, select:focus, textarea:focus {
       border-color: #2563eb;
       box-shadow: 0 0 0 1px rgba(37,99,235,0.35);
       background: #ffffff;
@@ -176,32 +177,64 @@
       cursor: pointer;
     }
 
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(3,minmax(0,1fr));
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    @media (max-width: 900px) {
-      .summary { grid-template-columns: repeat(2,minmax(0,1fr)); }
-    }
-    .summary-item {
-      padding: 6px 10px;
-      border-radius: 10px;
-      background: #f9fafb;
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0 6px;
+      border-radius: 999px;
+      font-size: 10px;
       border: 1px solid #e5e7eb;
-    }
-    .summary-label {
-      font-size: 11px;
+      background: #f9fafb;
       color: #6b7280;
-      margin-bottom: 4px;
     }
-    .summary-value {
-      font-size: 14px;
+
+    /* 顶部“客户卡片” */
+    .client-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill,minmax(240px,1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .client-card {
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .client-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 2px;
+    }
+    .client-card-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #111827;
+    }
+    .client-card-rate {
+      font-size: 12px;
       font-weight: 600;
     }
-    .summary-value.positive { color: #16a34a; }
-    .summary-value.negative { color: #dc2626; }
+    .client-card-rate.positive { color: #16a34a; }
+    .client-card-rate.negative { color: #dc2626; }
+    .client-card-body {
+      font-size: 11px;
+      color: #4b5563;
+      line-height: 1.4;
+    }
+    .client-card-body div { margin-bottom: 1px; }
+    .client-card-footer {
+      display: flex;
+      justify-content: flex-start;
+      gap: 6px;
+      margin-top: 4px;
+    }
 
     table {
       width: 100%;
@@ -263,18 +296,6 @@
       text-align: center;
     }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 0 6px;
-      border-radius: 999px;
-      font-size: 10px;
-      border: 1px solid #e5e7eb;
-      background: #f9fafb;
-      color: #6b7280;
-    }
-
     .footer {
       margin-top: 16px;
       font-size: 10px;
@@ -282,7 +303,7 @@
       text-align: right;
     }
 
-    /* 弹窗样式 */
+    /* 弹窗通用样式 */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -299,6 +320,7 @@
       width: 100%;
       padding: 16px 18px 14px;
       box-shadow: 0 18px 40px rgba(15,23,42,0.35);
+      position: relative;
     }
     .modal-title {
       font-size: 14px;
@@ -316,6 +338,11 @@
       margin-top: 10px;
       text-align: right;
     }
+    .modal-close {
+      position: absolute;
+      right: 14px;
+      top: 10px;
+    }
 
     /* 股票筛选输入框 */
     .stock-filter {
@@ -331,6 +358,58 @@
       border-color: #2563eb;
       box-shadow: 0 0 0 1px rgba(37,99,235,0.3);
       background: #ffffff;
+    }
+
+    /* 推荐标签小圆角 */
+    .recommend-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0 6px;
+      border-radius: 999px;
+      font-size: 10px;
+      border: 1px solid #e5e7eb;
+      background: #f1f5f9;
+      color: #0369a1;
+      margin-left: 4px;
+    }
+
+    /* 客户档案弹窗（大一点，可滚动） */
+    .profile-modal {
+      max-width: 720px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .profile-modal-body {
+      flex: 1;
+      overflow: auto;
+      padding-right: 4px;
+      font-size: 12px;
+      color: #4b5563;
+    }
+    .profile-section {
+      margin-top: 10px;
+      margin-bottom: 6px;
+    }
+    .profile-section label {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .profile-row-2 {
+      display: grid;
+      grid-template-columns: repeat(2,minmax(0,1fr));
+      gap: 10px;
+    }
+    .profile-hint {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+    .profile-footer-tip {
+      font-size: 10px;
+      color: #9ca3af;
+      margin-top: 8px;
+      text-align: center;
     }
   </style>
 </head>
@@ -356,7 +435,7 @@
       <section class="card">
         <div class="card-title">
           新增 / 修改持仓
-          <span>Symbol 示例：005930（KOSPI）、338220（KOSDAQ）</span>
+          <span>代码示例：005930（三星电子）、338220（뷰노）</span>
         </div>
 
         <form id="holdForm">
@@ -393,6 +472,14 @@
             </div>
           </div>
 
+          <label style="margin-top:8px;">是否为推荐股</label>
+          <select id="recommendType">
+            <option value="">否</option>
+            <option value="recommend">推荐</option>
+            <option value="good">推荐绩优股</option>
+            <option value="switch">推荐换优股</option>
+          </select>
+
           <div style="margin-top:10px; display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap;">
             <button type="submit" class="btn btn-primary">
               <span id="submitLabel">保存持仓</span>
@@ -410,11 +497,11 @@
         </form>
       </section>
 
-      <!-- 右侧：汇总 + 明细 -->
+      <!-- 右侧：客户卡片 + 明细 -->
       <section class="card">
         <div class="card-title">
           持仓概览 · 实时报价
-          <span>自动刷新 + 止盈/止损颜色提示</span>
+          <span>自动刷新 + 客户卡片 + 止盈/止损颜色提示</span>
         </div>
 
         <div class="toolbar">
@@ -445,21 +532,10 @@
           </div>
         </div>
 
-        <div class="summary">
-          <div class="summary-item">
-            <div class="summary-label">总投入成本</div>
-            <div class="summary-value" id="sumCost">₩ 0</div>
-          </div>
-          <div class="summary-item">
-            <div class="summary-label">当前市值</div>
-            <div class="summary-value" id="sumValue">₩ 0</div>
-          </div>
-          <div class="summary-item">
-            <div class="summary-label">总盈亏 / 收益率</div>
-            <div class="summary-value" id="sumPnl">₩ 0（0.00%）</div>
-          </div>
-        </div>
+        <!-- 顶部客户卡片 -->
+        <div id="clientCards" class="client-card-grid"></div>
 
+        <!-- 明细表格 -->
         <div style="max-height:420px; overflow:auto; border-radius:10px; border:1px solid #e5e7eb;">
           <table>
             <thead>
@@ -496,6 +572,7 @@
   <!-- AI 解析弹窗 -->
   <div id="aiModalBackdrop" class="modal-backdrop">
     <div class="modal">
+      <button type="button" class="btn btn-ghost btn-sm modal-close" onclick="closeAiModal()">关闭</button>
       <div class="modal-title">AI 解析建议（示意逻辑，本地生成）</div>
       <div id="aiModalBody" class="modal-body"></div>
       <div class="modal-footer">
@@ -507,6 +584,7 @@
   <!-- 卖出弹窗 -->
   <div id="sellModalBackdrop" class="modal-backdrop">
     <div class="modal">
+      <button type="button" class="btn btn-ghost btn-sm modal-close" onclick="closeSellModal()">关闭</button>
       <div class="modal-title">卖出总结（仅本地模拟）</div>
       <div id="sellModalBody" class="modal-body"></div>
       <div class="modal-footer">
@@ -515,11 +593,74 @@
     </div>
   </div>
 
-  <script>
-    // ==== 本地存储键 ====
-    const STORAGE_KEY = "korea_portfolio_holdings_v2";
+  <!-- 客户档案弹窗 -->
+  <div id="clientProfileBackdrop" class="modal-backdrop">
+    <div class="modal profile-modal">
+      <button type="button" class="btn btn-ghost btn-sm modal-close" onclick="closeClientProfile()">关闭</button>
+      <div class="modal-title" id="profileModalTitle">客户档案</div>
+      <div class="profile-modal-body">
+        <div class="profile-section">
+          <label>客户：</label>
+          <div id="profileClientName" style="font-weight:600;margin-top:2px;"></div>
+        </div>
 
-    // ==== DOM ====
+        <div class="profile-section profile-row-2">
+          <div>
+            <label>性别</label>
+            <select id="profileGender">
+              <option value="">未填写</option>
+              <option value="男">男</option>
+              <option value="女">女</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          <div>
+            <label>年龄（岁）</label>
+            <input id="profileAge" type="number" min="0" placeholder="例如：46" />
+          </div>
+        </div>
+
+        <div class="profile-section profile-row-2">
+          <div>
+            <label>股龄 / 投资时间</label>
+            <input id="profileInvestYears" placeholder="例如：新手 / 2年" />
+          </div>
+          <div>
+            <label>炒股操作方式</label>
+            <input id="profileTradingStyle" placeholder="例如：短线 / 波段 / 长线" />
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <label>兴趣爱好</label>
+          <input id="profileHobbies" placeholder="例如：足球 / 旅游 / 摄影等" />
+        </div>
+
+        <div class="profile-section">
+          <label>家庭情况</label>
+          <input id="profileFamily" placeholder="例如：已婚三个孩子 / 独居等" />
+        </div>
+
+        <div class="profile-section">
+          <label>备注（选填）</label>
+          <textarea id="profileNote" rows="3" placeholder="例如：风险承受能力、职业、收入稳定性等"></textarea>
+        </div>
+
+        <div class="profile-footer-tip">
+          客户档案信息仅保存在本机浏览器中，用于日常沟通与投资偏好管理。
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="saveClientProfile()">保存档案</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "korea_portfolio_holdings_v3";
+    const PROFILE_KEY = "korea_client_profiles_v1";
+
+    // DOM - 持仓与表格
     const form = document.getElementById("holdForm");
     const editIdInput = document.getElementById("editId");
     const clientInput = document.getElementById("client");
@@ -529,6 +670,7 @@
     const costInput = document.getElementById("cost");
     const stopLossInput = document.getElementById("stopLoss");
     const takeProfitInput = document.getElementById("takeProfit");
+    const recommendTypeSelect = document.getElementById("recommendType");
     const resetBtn = document.getElementById("resetBtn");
     const clearAllBtn = document.getElementById("clearAllBtn");
     const refreshBtn = document.getElementById("refreshBtn");
@@ -537,20 +679,32 @@
     const exportBtn = document.getElementById("exportBtn");
     const tableBody = document.getElementById("tableBody");
     const emptyTip = document.getElementById("emptyTip");
-    const sumCostEl = document.getElementById("sumCost");
-    const sumValueEl = document.getElementById("sumValue");
-    const sumPnlEl = document.getElementById("sumPnl");
-    const submitLabel = document.getElementById("submitLabel");
+    const clientCardsEl = document.getElementById("clientCards");
 
+    // DOM - 弹窗
     const aiModalBackdrop = document.getElementById("aiModalBackdrop");
     const aiModalBody = document.getElementById("aiModalBody");
     const sellModalBackdrop = document.getElementById("sellModalBackdrop");
     const sellModalBody = document.getElementById("sellModalBody");
     const stockFilterInput = document.getElementById("stockFilter");
 
+    // 客户档案弹窗 DOM
+    const clientProfileBackdrop = document.getElementById("clientProfileBackdrop");
+    const profileModalTitle = document.getElementById("profileModalTitle");
+    const profileClientNameEl = document.getElementById("profileClientName");
+    const profileGenderEl = document.getElementById("profileGender");
+    const profileAgeEl = document.getElementById("profileAge");
+    const profileInvestYearsEl = document.getElementById("profileInvestYears");
+    const profileTradingStyleEl = document.getElementById("profileTradingStyle");
+    const profileHobbiesEl = document.getElementById("profileHobbies");
+    const profileFamilyEl = document.getElementById("profileFamily");
+    const profileNoteEl = document.getElementById("profileNote");
+
     let holdings = [];
     let autoTimer = null;
-    let stockFilterKeyword = ""; // 当前股票筛选关键字
+    let stockFilterKeyword = "";
+    let clientProfiles = {};
+    let currentProfileClient = null;
 
     function loadHoldings() {
       try {
@@ -564,6 +718,19 @@
     function saveHoldings() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(holdings));
       renderAll();
+    }
+
+    function loadClientProfiles() {
+      try {
+        const raw = localStorage.getItem(PROFILE_KEY);
+        clientProfiles = raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        clientProfiles = {};
+      }
+    }
+
+    function saveClientProfiles() {
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(clientProfiles));
     }
 
     function formatNumber(n) {
@@ -587,45 +754,116 @@
       return map;
     }
 
-    function renderSummary() {
-      let totalCost = 0;
-      let totalValue = 0;
-
-      holdings.forEach(h => {
-        const qty = Number(h.quantity) || 0;
-        const cost = Number(h.cost) || 0;
-        const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
-        totalCost += qty * cost;
-        totalValue += qty * cur;
+    function getFilteredHoldings() {
+      if (!stockFilterKeyword) return holdings;
+      return holdings.filter(h => {
+        const name = (h.stockName || "").toLowerCase();
+        const code = (h.code || "").toLowerCase();
+        return (
+          name.includes(stockFilterKeyword) ||
+          code.includes(stockFilterKeyword)
+        );
       });
-
-      const pnl = totalValue - totalCost;
-      const rate = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
-
-      sumCostEl.textContent = "₩ " + formatNumber(totalCost);
-      sumValueEl.textContent = "₩ " + formatNumber(totalValue);
-
-      sumPnlEl.textContent = `₩ ${formatNumber(pnl)}（${formatPercent(rate)}）`;
-      sumPnlEl.classList.remove("positive","negative");
-      if (pnl > 0) sumPnlEl.classList.add("positive");
-      else if (pnl < 0) sumPnlEl.classList.add("negative");
     }
 
+    // 顶部客户卡片
+    function renderClientCards() {
+      clientCardsEl.innerHTML = "";
+      const filtered = getFilteredHoldings();
+      if (!filtered.length) return;
+
+      const groups = groupByClient(filtered);
+      const clients = Object.keys(groups).sort();
+
+      clients.forEach(clientName => {
+        const list = groups[clientName];
+
+        let costSum = 0, valSum = 0, qtySum = 0;
+        list.forEach(h => {
+          const qty = Number(h.quantity) || 0;
+          const cost = Number(h.cost) || 0;
+          const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
+          qtySum += qty;
+          costSum += qty * cost;
+          valSum += qty * cur;
+        });
+        const pnl = valSum - costSum;
+        const rate = costSum > 0 ? (pnl / costSum) * 100 : 0;
+
+        const card = document.createElement("div");
+        card.className = "client-card";
+
+        const header = document.createElement("div");
+        header.className = "client-card-header";
+        const nameEl = document.createElement("div");
+        nameEl.className = "client-card-name";
+        nameEl.textContent = clientName;
+        const rateEl = document.createElement("div");
+        rateEl.className =
+          "client-card-rate " +
+          (rate > 0 ? "positive" : rate < 0 ? "negative" : "");
+        rateEl.textContent = formatPercent(rate);
+        header.appendChild(nameEl);
+        header.appendChild(rateEl);
+
+        const body = document.createElement("div");
+        body.className = "client-card-body";
+
+        // 档案信息行
+        const profile = clientProfiles[clientName] || {};
+        const genderText = profile.gender || "未填";
+        const ageText = profile.age ? profile.age + "岁" : "";
+        const investText = profile.investYears || "";
+        const profileLine = document.createElement("div");
+        profileLine.textContent =
+          "档案：" +
+          [genderText, ageText, investText].filter(Boolean).join(" / ");
+
+        const line1 = document.createElement("div");
+        line1.textContent = `基本信息：${list.length} 只股票 / 合计 ${qtySum.toLocaleString("ko-KR")} 股`;
+        const line2 = document.createElement("div");
+        line2.textContent = `总投入成本：₩ ${formatNumber(costSum)}`;
+        const line3 = document.createElement("div");
+        line3.textContent = `当前市值：₩ ${formatNumber(valSum)}`;
+        const line4 = document.createElement("div");
+        line4.textContent = `总盈亏：₩ ${formatNumber(pnl)}`;
+
+        body.appendChild(profileLine);
+        body.appendChild(line1);
+        body.appendChild(line2);
+        body.appendChild(line3);
+        body.appendChild(line4);
+
+        const footer = document.createElement("div");
+        footer.className = "client-card-footer";
+
+        const detailBtn = document.createElement("button");
+        detailBtn.type = "button";
+        detailBtn.className = "btn btn-ghost btn-sm";
+        detailBtn.textContent = "客户档案";
+        detailBtn.onclick = () => openClientProfile(clientName);
+
+        const aiBtn = document.createElement("button");
+        aiBtn.type = "button";
+        aiBtn.className = "btn btn-secondary btn-sm";
+        aiBtn.textContent = "AI解析建议";
+        aiBtn.onclick = () => openClientAiSummary(clientName);
+
+        footer.appendChild(detailBtn);
+        footer.appendChild(aiBtn);
+
+        card.appendChild(header);
+        card.appendChild(body);
+        card.appendChild(footer);
+
+        clientCardsEl.appendChild(card);
+      });
+    }
+
+    // 表格
     function renderTable() {
       tableBody.innerHTML = "";
-
-      // 根据筛选关键字过滤：按股票名称 or 代码
-      let filtered = holdings;
-      if (stockFilterKeyword) {
-        filtered = holdings.filter(h => {
-          const name = (h.stockName || "").toLowerCase();
-          const code = (h.code || "").toLowerCase();
-          return (
-            name.includes(stockFilterKeyword) ||
-            code.includes(stockFilterKeyword)
-          );
-        });
-      }
+      const filtered = getFilteredHoldings();
 
       if (!filtered.length) {
         emptyTip.style.display = "block";
@@ -686,6 +924,18 @@
           const tdClient = document.createElement("td");
           tdClient.className = "t-left";
           tdClient.textContent = h.client;
+
+          if (h.recommendType) {
+            const badge = document.createElement("span");
+            badge.className = "recommend-badge";
+            badge.textContent =
+              h.recommendType === "recommend"
+                ? "推荐"
+                : h.recommendType === "good"
+                ? "推荐绩优"
+                : "换优股";
+            tdClient.appendChild(badge);
+          }
 
           const tdStock = document.createElement("td");
           tdStock.className = "t-left";
@@ -796,7 +1046,7 @@
     }
 
     function renderAll() {
-      renderSummary();
+      renderClientCards();
       renderTable();
     }
 
@@ -805,6 +1055,8 @@
       submitLabel.textContent = "保存持仓";
       form.reset();
     }
+
+    const submitLabel = document.getElementById("submitLabel");
 
     function startEdit(id) {
       const h = holdings.find(x => x.id === id);
@@ -817,6 +1069,7 @@
       costInput.value = h.cost;
       stopLossInput.value = h.stopLoss ?? "";
       takeProfitInput.value = h.takeProfit ?? "";
+      recommendTypeSelect.value = h.recommendType || "";
       submitLabel.textContent = "保存修改";
     }
 
@@ -836,6 +1089,7 @@
       const cost = Number(costInput.value);
       const stopLoss = stopLossInput.value ? Number(stopLossInput.value) : null;
       const takeProfit = takeProfitInput.value ? Number(takeProfitInput.value) : null;
+      const recommendType = recommendTypeSelect.value || "";
 
       if (!client || !stockName || !code || !quantity || !cost) {
         alert("请完整填写必填项。");
@@ -849,7 +1103,8 @@
           holdings[idx] = {
             ...holdings[idx],
             client, stockName, code,
-            quantity, cost, stopLoss, takeProfit
+            quantity, cost, stopLoss, takeProfit,
+            recommendType
           };
         }
       } else {
@@ -862,6 +1117,7 @@
           cost,
           stopLoss,
           takeProfit,
+          recommendType,
           currentPrice: null,
           updatedAt: null
         });
@@ -881,7 +1137,7 @@
       resetForm();
     });
 
-    // === 自动刷新相关 ===
+    // 自动刷新
     function setAutoRefresh(on) {
       if (autoTimer) {
         clearInterval(autoTimer);
@@ -910,13 +1166,14 @@
       refreshPrices();
     });
 
-    // 股票筛选输入
+    // 股票筛选
     stockFilterInput.addEventListener("input", () => {
       stockFilterKeyword = stockFilterInput.value.trim().toLowerCase();
+      renderClientCards();
       renderTable();
     });
 
-    // === 核心：刷新行情 ===
+    // 刷新行情
     async function refreshPrices(symbolsOverride) {
       try {
         if (!holdings.length && !symbolsOverride) return;
@@ -942,7 +1199,7 @@
           return;
         }
 
-        const data = await res.json(); // { "005930":{ok:true,price:xxx}, ... }
+        const data = await res.json();
         const now = new Date().toISOString();
 
         holdings.forEach(h => {
@@ -954,13 +1211,12 @@
         });
 
         saveHoldings();
-        console.log("📌 行情刷新完成");
       } catch (e) {
         console.error("刷新行情异常:", e);
       }
     }
 
-    // === 导出收益日报（CSV） ===
+    // 导出 CSV
     exportBtn.addEventListener("click", () => {
       if (!holdings.length) {
         alert("当前没有任何持仓记录可导出。");
@@ -979,6 +1235,7 @@
         "收益率(%)",
         "止损",
         "止盈",
+        "推荐类型",
         "更新时间"
       ]);
 
@@ -989,6 +1246,15 @@
         const val = qty * cur;
         const pnl = val - qty * cost;
         const rate = qty * cost > 0 ? (pnl / (qty * cost)) * 100 : 0;
+
+        const recommendLabel =
+          h.recommendType === "recommend"
+            ? "推荐"
+            : h.recommendType === "good"
+            ? "推荐绩优股"
+            : h.recommendType === "switch"
+            ? "推荐换优股"
+            : "";
 
         rows.push([
           h.client,
@@ -1002,35 +1268,8 @@
           rate.toFixed(2),
           h.stopLoss ?? "",
           h.takeProfit ?? "",
+          recommendLabel,
           h.updatedAt ? new Date(h.updatedAt).toLocaleString("zh-CN") : ""
-        ]);
-      });
-
-      rows.push([]);
-      rows.push(["=== 按客户汇总 ==="]);
-      const groups = groupByClient(holdings);
-      Object.keys(groups).forEach(name => {
-        const list = groups[name];
-        let costSum = 0, valSum = 0;
-        list.forEach(h => {
-          const qty = Number(h.quantity) || 0;
-          const cost = Number(h.cost) || 0;
-          const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
-          costSum += qty * cost;
-          valSum += qty * cur;
-        });
-        const pnl = valSum - costSum;
-        const rate = costSum > 0 ? (pnl / costSum) * 100 : 0;
-        rows.push([
-          name,
-          "",
-          "",
-          "",
-          "",
-          "",
-          valSum,
-          pnl,
-          rate.toFixed(2)
         ]);
       });
 
@@ -1053,7 +1292,7 @@
       URL.revokeObjectURL(url);
     });
 
-    // === AI 解析弹窗（本地规则生成一段话） ===
+    // AI 解析：单票
     function openAiModal(h) {
       const qty = Number(h.quantity) || 0;
       const cost = Number(h.cost) || 0;
@@ -1086,7 +1325,7 @@
       aiModalBackdrop.style.display = "none";
     }
 
-    // === 卖出弹窗（本地模拟，不真正删除持仓） ===
+    // 卖出总结
     function openSellModal(h) {
       const qty = Number(h.quantity) || 0;
       const cost = Number(h.cost) || 0;
@@ -1115,8 +1354,85 @@
       sellModalBackdrop.style.display = "none";
     }
 
-    // === 初始化 ===
+    // 客户 AI 综合建议（按组合）
+    function openClientAiSummary(clientName) {
+      const filtered = getFilteredHoldings();
+      const groups = groupByClient(filtered);
+      const list = groups[clientName] || [];
+      if (!list.length) return;
+
+      let costSum = 0, valueSum = 0;
+      list.forEach(h => {
+        const qty = Number(h.quantity) || 0;
+        const cost = Number(h.cost) || 0;
+        const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
+        costSum += qty * cost;
+        valueSum += qty * cur;
+      });
+      const pnl = valueSum - costSum;
+      const rate = costSum > 0 ? (pnl / costSum) * 100 : 0;
+
+      let tone = "";
+      if (rate > 20) tone = "整体组合收益已经非常可观，建议优先锁定一部分利润，把账面收益落袋为安。";
+      else if (rate > 5) tone = "组合节奏还不错，可以在强势股上适当分批减仓，同时给低位标的预留一点弹药。";
+      else if (rate > -5) tone = "目前整体在可接受区间内，先把每只股票的止损价和观察位确认好，以稳为主。";
+      else if (rate > -15) tone = "组合回撤有点偏大了，建议把弱势股和逻辑变化不好的标的优先减掉，缓一缓整体风险。";
+      else tone = "当前整体压力较大，先控制好总仓位，避免再加仓补跌，后面等趋势企稳再考虑重新布局。";
+
+      const text =
+        `【${clientName} · 组合级别建议】\n` +
+        `组合总投入约 ₩${formatNumber(costSum)}，当前市值约 ₩${formatNumber(valueSum)}，` +
+        `整体浮动盈亏约 ₩${formatNumber(pnl)}（${formatPercent(rate)}）。\n\n` +
+        `从结构上看，可以优先区分：\n` +
+        `① 强势趋势票：缩量回踩不破支撑的标的，适合做“高位减仓，回调再接”；\n` +
+        `② 弱势或逻辑变弱票：连续跌破支撑、成交量放大但股价不跟涨的标的，要考虑果断调仓。\n\n` +
+        tone + ` 接下来我们可以按“核心持仓 + 卫星仓位”的思路，一起把组合做得更稳、更轻松。`;
+
+      aiModalBody.textContent = text;
+      aiModalBackdrop.style.display = "flex";
+    }
+
+    // 客户档案弹窗逻辑
+    function openClientProfile(clientName) {
+      currentProfileClient = clientName;
+      profileModalTitle.textContent = clientName + " · 客户档案";
+      profileClientNameEl.textContent = clientName;
+
+      const profile = clientProfiles[clientName] || {};
+      profileGenderEl.value = profile.gender || "";
+      profileAgeEl.value = profile.age || "";
+      profileInvestYearsEl.value = profile.investYears || "";
+      profileTradingStyleEl.value = profile.tradingStyle || "";
+      profileHobbiesEl.value = profile.hobbies || "";
+      profileFamilyEl.value = profile.family || "";
+      profileNoteEl.value = profile.note || "";
+
+      clientProfileBackdrop.style.display = "flex";
+    }
+
+    function saveClientProfile() {
+      if (!currentProfileClient) return;
+      clientProfiles[currentProfileClient] = {
+        gender: profileGenderEl.value,
+        age: profileAgeEl.value.trim(),
+        investYears: profileInvestYearsEl.value.trim(),
+        tradingStyle: profileTradingStyleEl.value.trim(),
+        hobbies: profileHobbiesEl.value.trim(),
+        family: profileFamilyEl.value.trim(),
+        note: profileNoteEl.value.trim()
+      };
+      saveClientProfiles();
+      clientProfileBackdrop.style.display = "none";
+      renderClientCards(); // 更新卡片上显示的档案信息
+    }
+
+    function closeClientProfile() {
+      clientProfileBackdrop.style.display = "none";
+    }
+
+    // 初始化
     loadHoldings();
+    loadClientProfiles();
     renderAll();
   </script>
 </body>
