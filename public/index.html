@@ -9,7 +9,7 @@
     body {
       margin: 0;
       font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
-      background: radial-gradient(circle at top, #e0f2fe 0, #f3f4f6 40%, #e5e7eb 100%);
+      background: radial-gradient(circle at top,#e0f2ff 0,#f9fafb 55%,#e5e7eb 100%);
       color: #111827;
     }
     a { color: #2563eb; text-decoration: none; }
@@ -23,20 +23,18 @@
 
     .header {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
       margin-bottom: 16px;
-      gap: 12px;
-      flex-wrap: wrap;
     }
     .title {
       font-size: 22px;
       font-weight: 700;
-      color: #0f172a;
+      color: #111827;
     }
     .subtitle {
       font-size: 12px;
-      color: #4b5563;
+      color: #6b7280;
       margin-top: 4px;
     }
 
@@ -46,11 +44,10 @@
       padding: 4px 10px;
       border-radius: 999px;
       font-size: 11px;
-      background: rgba(37,99,235,0.06);
-      border: 1px solid rgba(37,99,235,0.25);
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
       color: #1d4ed8;
       gap: 4px;
-      font-weight: 500;
     }
 
     .grid {
@@ -59,17 +56,15 @@
       gap: 16px;
     }
     @media (max-width: 900px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
+      .grid { grid-template-columns: 1fr; }
     }
 
     .card {
       background: #ffffff;
-      border-radius: 16px;
+      border-radius: 14px;
       border: 1px solid #e5e7eb;
       padding: 14px 16px;
-      box-shadow: 0 12px 25px rgba(15,23,42,0.06);
+      box-shadow: 0 14px 30px rgba(15,23,42,0.08);
     }
     .card-title {
       font-size: 14px;
@@ -79,22 +74,20 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
     }
     .card-title span {
       font-size: 11px;
-      color: #6b7280;
+      color: #9ca3af;
       font-weight: 400;
     }
 
     label {
       display: block;
       font-size: 12px;
-      color: #4b5563;
+      color: #6b7280;
       margin-bottom: 4px;
     }
-    input, select, textarea {
+    input {
       width: 100%;
       border-radius: 9px;
       border: 1px solid #d1d5db;
@@ -103,12 +96,10 @@
       font-size: 13px;
       padding: 7px 10px;
       outline: none;
-      transition: border-color .15s, box-shadow .15s, background .15s;
-      resize: vertical;
     }
-    input:focus, select:focus, textarea:focus {
+    input:focus {
       border-color: #2563eb;
-      box-shadow: 0 0 0 1px rgba(37,99,235,0.25);
+      box-shadow: 0 0 0 1px rgba(37,99,235,0.35);
       background: #ffffff;
     }
     .row {
@@ -127,36 +118,34 @@
       align-items: center;
       justify-content: center;
       gap: 4px;
-      transition: transform .05s, box-shadow .1s, filter .1s;
+      transition: transform 0.05s ease, box-shadow 0.08s ease, filter 0.08s ease;
+      white-space: nowrap;
     }
+    .btn:hover { filter: brightness(1.03); }
     .btn:active {
       transform: translateY(1px);
       box-shadow: none;
     }
     .btn-primary {
-      background: linear-gradient(135deg,#2563eb,#3b82f6);
-      color: #f9fafb;
-      box-shadow: 0 8px 18px rgba(37,99,235,0.35);
+      background: linear-gradient(135deg,#22c55e,#16a34a);
+      color: #ecfdf5;
+      box-shadow: 0 10px 20px rgba(22,163,74,0.35);
     }
-    .btn-primary:hover { filter: brightness(1.03); }
     .btn-secondary {
-      background: #ffffff;
-      color: #1f2937;
-      border: 1px solid #cbd5f5;
+      background: #eef2ff;
+      color: #1e40af;
+      border: 1px solid #c7d2fe;
     }
-    .btn-secondary:hover { border-color: #94a3b8; }
     .btn-ghost {
       background: #f9fafb;
       color: #4b5563;
       border: 1px solid #e5e7eb;
     }
-    .btn-ghost:hover { border-color: #cbd5f5; }
     .btn-danger {
       background: #fee2e2;
       color: #b91c1c;
       border: 1px solid #fecaca;
     }
-
     .btn-sm { padding: 4px 10px; font-size: 11px; }
 
     .toolbar {
@@ -187,58 +176,32 @@
       cursor: pointer;
     }
 
-    /* 顶部汇总区：每个客户一张卡片 */
     .summary {
       display: grid;
-      grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
-      gap: 10px;
+      grid-template-columns: repeat(3,minmax(0,1fr));
+      gap: 8px;
       margin-bottom: 10px;
     }
+    @media (max-width: 900px) {
+      .summary { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
     .summary-item {
-      padding: 8px 10px;
-      border-radius: 12px;
+      padding: 6px 10px;
+      border-radius: 10px;
       background: #f9fafb;
       border: 1px solid #e5e7eb;
-      transition: background .15s, border-color .15s, box-shadow .15s;
-    }
-    /* 有推荐股的客户卡片：蓝色高亮 */
-    .summary-item.follow-card {
-      background: #eff6ff;
-      border-color: #bfdbfe;
-      box-shadow: 0 0 0 1px rgba(129,140,248,0.5);
-    }
-    .summary-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 4px;
-      gap: 6px;
-    }
-    .summary-client {
-      font-size: 13px;
-      font-weight: 600;
-      color: #111827;
-    }
-    .summary-rate {
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .summary-rate.positive { color: #16a34a; }
-    .summary-rate.negative { color: #dc2626; }
-    .summary-line {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      color: #4b5563;
-    }
-    .summary-line + .summary-line {
-      margin-top: 2px;
     }
     .summary-label {
+      font-size: 11px;
       color: #6b7280;
+      margin-bottom: 4px;
     }
-    .summary-value.positive { color: #16a34a; font-weight: 600; }
-    .summary-value.negative { color: #dc2626; font-weight: 600; }
+    .summary-value {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .summary-value.positive { color: #16a34a; }
+    .summary-value.negative { color: #dc2626; }
 
     table {
       width: 100%;
@@ -246,7 +209,7 @@
       font-size: 11px;
     }
     thead {
-      background: #f1f5f9;
+      background: #f3f4f6;
       position: sticky;
       top: 0;
       z-index: 5;
@@ -268,10 +231,10 @@
     }
 
     .group-row td {
-      background: #eef2ff;
-      border-bottom-color: #c7d2fe;
+      background: #eff6ff;
+      border-bottom-color: #dbeafe;
       font-weight: 600;
-      color: #1e293b;
+      color: #1e3a8a;
     }
 
     .pill {
@@ -282,21 +245,9 @@
       align-items: center;
       justify-content: center;
     }
-    .pill-gain { background: #dcfce7; color: #15803d; }
+    .pill-gain { background: #dcfce7; color: #16a34a; }
     .pill-loss { background: #fee2e2; color: #b91c1c; }
     .pill-neutral { background: #e5e7eb; color: #4b5563; }
-
-    .tag-alert {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 10px;
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #1d4ed8;
-    }
 
     .row-actions {
       display: flex;
@@ -307,7 +258,7 @@
 
     .empty-tip {
       font-size: 12px;
-      color: #6b7280;
+      color: #9ca3af;
       padding: 16px 0;
       text-align: center;
     }
@@ -331,122 +282,56 @@
       text-align: right;
     }
 
-    /* ==== 弹窗通用 ==== */
+    /* 弹窗样式 */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(15,23,42,0.35);
-      z-index: 40;
+      background: rgba(15,23,42,0.45);
       display: none;
-    }
-    .modal {
-      position: fixed;
-      inset: 0;
-      display: flex;
       align-items: center;
       justify-content: center;
       z-index: 50;
-      pointer-events: none;
     }
-    .modal-inner {
-      pointer-events: auto;
-      width: 100%;
-      max-width: 460px;
+    .modal {
       background: #ffffff;
       border-radius: 14px;
-      box-shadow: 0 18px 45px rgba(15,23,42,0.45);
-      border: 1px solid #e5e7eb;
-      padding: 12px 14px;
-    }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-      gap: 8px;
+      max-width: 480px;
+      width: 100%;
+      padding: 16px 18px 14px;
+      box-shadow: 0 18px 40px rgba(15,23,42,0.35);
     }
     .modal-title {
       font-size: 14px;
       font-weight: 600;
+      margin-bottom: 8px;
       color: #111827;
     }
     .modal-body {
-      max-height: 260px;
-      overflow: auto;
       font-size: 12px;
+      color: #4b5563;
       line-height: 1.5;
-      color: #374151;
       white-space: pre-wrap;
-      border-top: 1px solid #e5e7eb;
-      padding-top: 6px;
-      margin-top: 4px;
     }
     .modal-footer {
-      margin-top: 8px;
+      margin-top: 10px;
       text-align: right;
-      font-size: 11px;
-      color: #9ca3af;
-    }
-    .btn-ai {
-      border-radius: 999px;
-      border: 1px solid #e5e7eb;
-      background: #eef2ff;
-      color: #3730a3;
-      padding: 3px 10px;
-      font-size: 11px;
-      cursor: pointer;
-    }
-    .btn-ai:hover {
-      border-color: #c7d2fe;
-      background: #e0e7ff;
     }
 
-    /* ==== 客户档案弹窗专用：更大 + 更“挤” ==== */
-    .profile-modal .modal-inner {
-      max-width: 640px;
-      padding: 12px 14px;
-    }
-    .profile-modal .modal-body {
-      max-height: 430px;
-      padding-top: 4px;
-      margin-top: 2px;
-    }
-    .profile-form {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .profile-form .row {
-      margin-top: 1px;
-      gap: 6px;
-    }
-    .profile-form label {
-      margin-bottom: 0;
-    }
-    .profile-form input,
-    .profile-form select,
-    .profile-form textarea {
+    /* 股票筛选输入框 */
+    .stock-filter {
+      min-width: 220px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
       font-size: 12px;
-      padding: 3px 6px;
+      background: #f9fafb;
     }
-    #profileClientNameLabel {
-      margin-bottom: 2px !important;
+    .stock-filter:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37,99,235,0.3);
+      background: #ffffff;
     }
-
-    /* 推荐股的股票单元格：蓝色高亮 */
-    .stock-recommend-cell {
-      background: #eff6ff;
-      color: #1d4ed8;
-      font-weight: 600;
-      border-radius: 999px;
-      padding: 2px 8px;
-      display: inline-block;
-    }
-/* 推荐股整行蓝色高亮 */
-.recommend-row {
-  background: #e8f0ff !important;
-}
-
   </style>
 </head>
 <body>
@@ -455,42 +340,36 @@
       <div>
         <div class="title">韩国股票客户持仓追踪</div>
         <div class="subtitle">
-          客户按姓名分组管理，<b>每位客户单独统计总投入成本 / 当前市值 / 总盈亏 / 收益率</b>，支持自动刷新 Naver 行情与导出收益日报（数据仅保存在本机浏览器中）。
+          客户按姓名分组管理，每位客户单独统计投入成本 / 当前市值 / 收益率，支持自动刷新 Naver 行情与导出收益日报（数据仅保存在本机浏览器中）。
         </div>
       </div>
       <div>
         <span class="tag">
           <span>시장</span>
-          <strong>KOSPI / KOSDAQ</strong>
+          <strong>KOSPI · KOSDAQ</strong>
         </span>
       </div>
     </header>
 
     <main class="grid">
-      <!-- 左侧：新增 / 修改持仓 -->
+      <!-- 左侧：新增 / 编辑持仓 -->
       <section class="card">
         <div class="card-title">
           新增 / 修改持仓
-          <span>Symbol 示例：005930.KS（KOSPI）、353200.KQ（KOSDAQ）</span>
+          <span>Symbol 示例：005930（KOSPI）、338220（KOSDAQ）</span>
         </div>
 
         <form id="holdForm">
           <input type="hidden" id="editId" />
 
           <label>客户姓名 / 分组名</label>
-          <input id="client" placeholder="例如：张三 / 悟空组" required />
+          <input id="client" placeholder="例如：推荐 / 陈雨VIP组" required />
 
           <label style="margin-top:8px;">股票名称</label>
-          <input id="stockName" placeholder="例如：삼성전자 / 박셀바이오" required />
+          <input id="stockName" placeholder="例如：삼성전자 / 대한전선" required />
 
-          <label style="margin-top:8px;">证券代码（可带 .KS / .KQ）</label>
-          <input id="symbol" placeholder="例如：005930.KS / 323990.KQ" required />
-
-          <label style="margin-top:8px;">是否为推荐股</label>
-          <select id="isRecommend">
-            <option value="否" selected>否</option>
-            <option value="是">是</option>
-          </select>
+          <label style="margin-top:8px;">证券代码（6位数字）</label>
+          <input id="code" placeholder="例如：005930 / 338220" required />
 
           <div class="row" style="margin-top:8px;">
             <div>
@@ -525,8 +404,8 @@
           </div>
 
           <div style="margin-top:8px; font-size:11px; color:#6b7280;">
-            数据保存在浏览器 <span class="badge">localStorage</span> 中，仅对本机可见。<br/>
-            如需多设备同步，可后续升级为云端版。
+            数据保存在浏览器 <span class="badge">localStorage</span> 中，只在本机可见。<br/>
+            如需多台设备同步，可以之后再做云端版本。
           </div>
         </form>
       </section>
@@ -535,33 +414,53 @@
       <section class="card">
         <div class="card-title">
           持仓概览 · 实时报价
-          <span>
-            <span class="tag-alert">每位客户单独汇总 · 自动刷新 Naver 行情 · 支持查看 / 编辑客户详细档案</span>
-          </span>
+          <span>自动刷新 + 止盈/止损颜色提示</span>
         </div>
 
         <div class="toolbar">
+          <!-- 股票筛选 -->
+          <div class="toolbar-right">
+            <input
+              id="stockFilter"
+              class="stock-filter"
+              placeholder="按股票名称 / 代码筛选，如 삼성전자 / 005930"
+            />
+          </div>
+
           <div class="toolbar-right">
             <button type="button" id="refreshBtn" class="btn btn-secondary btn-sm">🔄 手动刷新行情</button>
             <div class="switch">
               <input type="checkbox" id="autoRefreshToggle" />
               <label for="autoRefreshToggle" style="margin:0;">自动刷新</label>
             </div>
-            <select id="intervalSelect" style="width:auto;">
-              <option value="30" selected>30秒</option>
-              <option value="60">60秒</option>
+            <select id="intervalSelect" style="width:auto; font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid #d1d5db;">
+              <option value="30">30秒</option>
+              <option value="60" selected>60秒</option>
               <option value="120">120秒</option>
             </select>
           </div>
+
           <div class="toolbar-right">
             <button type="button" id="exportBtn" class="btn btn-ghost btn-sm">📤 导出收益日报（CSV）</button>
           </div>
         </div>
 
-        <!-- 每个客户独立汇总 -->
-        <div id="summaryContainer" class="summary"></div>
+        <div class="summary">
+          <div class="summary-item">
+            <div class="summary-label">总投入成本</div>
+            <div class="summary-value" id="sumCost">₩ 0</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">当前市值</div>
+            <div class="summary-value" id="sumValue">₩ 0</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">总盈亏 / 收益率</div>
+            <div class="summary-value" id="sumPnl">₩ 0（0.00%）</div>
+          </div>
+        </div>
 
-        <div style="max-height:420px; overflow:auto; border-radius:10px; border:1px solid #e5e7eb; margin-top:8px;">
+        <div style="max-height:420px; overflow:auto; border-radius:10px; border:1px solid #e5e7eb;">
           <table>
             <thead>
               <tr>
@@ -592,105 +491,40 @@
         </div>
       </section>
     </main>
+  </div>
 
-    <!-- AI 解析弹窗 -->
-    <div id="aiBackdrop" class="modal-backdrop"></div>
-    <div id="aiModal" class="modal" style="display:none;">
-      <div class="modal-inner">
-        <div class="modal-header">
-          <div id="aiModalTitle" class="modal-title">AI 解析建议</div>
-          <button type="button" id="aiModalClose" class="btn-ghost btn-sm">关闭</button>
-        </div>
-        <div id="aiModalContent" class="modal-body"></div>
-        <div class="modal-footer">
-          以上内容为程序根据当前持仓与客户档案自动生成，仅供参考，不构成投资建议。
-        </div>
+  <!-- AI 解析弹窗 -->
+  <div id="aiModalBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-title">AI 解析建议（示意逻辑，本地生成）</div>
+      <div id="aiModalBody" class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeAiModal()">好的，知道了</button>
       </div>
     </div>
+  </div>
 
-    <!-- 客户档案弹窗（不再包含“是否跟票”字段） -->
-    <div id="profileBackdrop" class="modal-backdrop"></div>
-    <div id="profileModal" class="modal profile-modal" style="display:none;">
-      <div class="modal-inner">
-        <div class="modal-header">
-          <div id="profileModalTitle" class="modal-title">客户档案</div>
-          <button type="button" id="profileModalClose" class="btn-ghost btn-sm">关闭</button>
-        </div>
-        <div id="profileModalContent" class="modal-body">
-          <form id="profileForm" class="profile-form">
-            <div id="profileClientNameLabel" style="font-size:12px;color:#4b5563;">
-              客户：-
-            </div>
-
-            <div class="row">
-              <div>
-                <label>性别</label>
-                <select id="profileGender">
-                  <option value="">未填写</option>
-                  <option value="男">男</option>
-                  <option value="女">女</option>
-                  <option value="其他">其他</option>
-                </select>
-              </div>
-              <div>
-                <label>年龄（岁）</label>
-                <input id="profileAge" type="number" min="0" step="1" placeholder="例如：46" />
-              </div>
-            </div>
-
-            <div class="row">
-              <div>
-                <label>股龄 / 投资时间</label>
-                <input id="profileStockAge" placeholder="例如：新手 / 2年" />
-              </div>
-              <div>
-                <label>炒股操作方式</label>
-                <input id="profileStyle" placeholder="例如：短线 / 波段 / 长线" />
-              </div>
-            </div>
-
-            <div>
-              <label>投资偏好</label>
-              <input id="profilePreference" placeholder="例如：AI / 生物医药 / 半导体 / 高股息等" />
-            </div>
-
-            <div>
-              <label>兴趣爱好</label>
-              <input id="profileHobby" placeholder="例如：足球 / 旅游 / 摄影等" />
-            </div>
-
-            <div>
-              <label>家庭情况</label>
-              <input id="profileFamily" placeholder="例如：已婚三个孩子 / 独居等" />
-            </div>
-
-            <div>
-              <label>备注（选填）</label>
-              <textarea id="profileNote" rows="2" placeholder="风险承受能力、职业、收入稳定性等"></textarea>
-            </div>
-
-            <div style="margin-top:4px; text-align:right;">
-              <button type="submit" class="btn btn-secondary btn-sm">保存档案</button>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          客户档案信息仅保存在本机浏览器中，用于日常沟通与投资偏好管理。
-        </div>
+  <!-- 卖出弹窗 -->
+  <div id="sellModalBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-title">卖出总结（仅本地模拟）</div>
+      <div id="sellModalBody" class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeSellModal()">关闭</button>
       </div>
     </div>
   </div>
 
   <script>
-    const STORAGE_KEY = "korea_portfolio_tracker_v1";
-    const PROFILE_STORAGE_KEY = "korea_client_profiles_v1";
+    // ==== 本地存储键 ====
+    const STORAGE_KEY = "korea_portfolio_holdings_v2";
 
+    // ==== DOM ====
     const form = document.getElementById("holdForm");
     const editIdInput = document.getElementById("editId");
     const clientInput = document.getElementById("client");
     const stockNameInput = document.getElementById("stockName");
-    const symbolInput = document.getElementById("symbol");
-    const isRecommendInput = document.getElementById("isRecommend");
+    const codeInput = document.getElementById("code");
     const quantityInput = document.getElementById("quantity");
     const costInput = document.getElementById("cost");
     const stopLossInput = document.getElementById("stopLoss");
@@ -703,40 +537,26 @@
     const exportBtn = document.getElementById("exportBtn");
     const tableBody = document.getElementById("tableBody");
     const emptyTip = document.getElementById("emptyTip");
+    const sumCostEl = document.getElementById("sumCost");
+    const sumValueEl = document.getElementById("sumValue");
+    const sumPnlEl = document.getElementById("sumPnl");
     const submitLabel = document.getElementById("submitLabel");
-    const summaryContainer = document.getElementById("summaryContainer");
 
-    const profileBackdrop = document.getElementById("profileBackdrop");
-    const profileModal = document.getElementById("profileModal");
-    const profileModalTitle = document.getElementById("profileModalTitle");
-    const profileModalClose = document.getElementById("profileModalClose");
-    const profileForm = document.getElementById("profileForm");
-    const profileClientNameLabel = document.getElementById("profileClientNameLabel");
-    const profileGenderInput = document.getElementById("profileGender");
-    const profileAgeInput = document.getElementById("profileAge");
-    const profileStockAgeInput = document.getElementById("profileStockAge");
-    const profileStyleInput = document.getElementById("profileStyle");
-    const profilePreferenceInput = document.getElementById("profilePreference");
-    const profileHobbyInput = document.getElementById("profileHobby");
-    const profileFamilyInput = document.getElementById("profileFamily");
-    const profileNoteInput = document.getElementById("profileNote");
-
-    const aiBackdrop = document.getElementById("aiBackdrop");
-    const aiModal = document.getElementById("aiModal");
-    const aiModalTitle = document.getElementById("aiModalTitle");
-    const aiModalContent = document.getElementById("aiModalContent");
-    const aiModalClose = document.getElementById("aiModalClose");
+    const aiModalBackdrop = document.getElementById("aiModalBackdrop");
+    const aiModalBody = document.getElementById("aiModalBody");
+    const sellModalBackdrop = document.getElementById("sellModalBackdrop");
+    const sellModalBody = document.getElementById("sellModalBody");
+    const stockFilterInput = document.getElementById("stockFilter");
 
     let holdings = [];
-    let clientProfiles = {};
     let autoTimer = null;
-    let currentProfileClientName = null;
+    let stockFilterKeyword = ""; // 当前股票筛选关键字
 
     function loadHoldings() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         holdings = raw ? JSON.parse(raw) : [];
-      } catch {
+      } catch (e) {
         holdings = [];
       }
     }
@@ -746,27 +566,8 @@
       renderAll();
     }
 
-    function loadProfiles() {
-      try {
-        const raw = localStorage.getItem(PROFILE_STORAGE_KEY);
-        clientProfiles = raw ? JSON.parse(raw) : {};
-      } catch {
-        clientProfiles = {};
-      }
-    }
-
-    function saveProfiles() {
-      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(clientProfiles));
-      renderSummary();
-    }
-
-    function getProfile(name) {
-      if (!name) return null;
-      return clientProfiles && clientProfiles[name] ? clientProfiles[name] : null;
-    }
-
     function formatNumber(n) {
-      return n.toLocaleString("ko-KR");
+      return Number(n || 0).toLocaleString("ko-KR");
     }
 
     function formatPercent(v) {
@@ -786,279 +587,63 @@
       return map;
     }
 
-    function openAiModal(title, content) {
-      aiModalTitle.textContent = title;
-      aiModalContent.textContent = content;
-      aiBackdrop.style.display = "block";
-      aiModal.style.display = "flex";
-    }
-    function closeAiModal() {
-      aiBackdrop.style.display = "none";
-      aiModal.style.display = "none";
-    }
-    aiBackdrop.addEventListener("click", closeAiModal);
-    aiModalClose.addEventListener("click", closeAiModal);
+    function renderSummary() {
+      let totalCost = 0;
+      let totalValue = 0;
 
-    function openProfileModal(clientName) {
-      currentProfileClientName = clientName;
-      profileModalTitle.textContent = `${clientName} · 客户档案`;
-      profileClientNameLabel.textContent = `客户：${clientName}`;
-
-      const p = getProfile(clientName) || {};
-      profileGenderInput.value = p.gender || "";
-      profileAgeInput.value = p.age !== undefined && p.age !== null ? p.age : "";
-      profileStockAgeInput.value = p.stockAge || "";
-      profileStyleInput.value = p.style || "";
-      profilePreferenceInput.value = p.preference || "";
-      profileHobbyInput.value = p.hobby || "";
-      profileFamilyInput.value = p.family || "";
-      profileNoteInput.value = p.note || "";
-
-      profileBackdrop.style.display = "block";
-      profileModal.style.display = "flex";
-    }
-    function closeProfileModal() {
-      profileBackdrop.style.display = "none";
-      profileModal.style.display = "none";
-      currentProfileClientName = null;
-    }
-    profileBackdrop.addEventListener("click", closeProfileModal);
-    profileModalClose.addEventListener("click", closeProfileModal);
-
-    profileForm.addEventListener("submit", e => {
-      e.preventDefault();
-      if (!currentProfileClientName) {
-        alert("未识别到客户姓名，无法保存档案。");
-        return;
-      }
-      const name = currentProfileClientName;
-      const profile = {
-        gender: profileGenderInput.value || "",
-        age: profileAgeInput.value ? Number(profileAgeInput.value) : "",
-        stockAge: profileStockAgeInput.value || "",
-        style: profileStyleInput.value || "",
-        preference: profilePreferenceInput.value || "",
-        hobby: profileHobbyInput.value || "",
-        family: profileFamilyInput.value || "",
-        note: profileNoteInput.value || ""
-      };
-      clientProfiles[name] = profile;
-      saveProfiles();
-      alert("客户档案已保存 / 更新。");
-      closeProfileModal();
-    });
-
-    function generateHoldingAdvice(h) {
-      const qty = Number(h.quantity) || 0;
-      const cost = Number(h.cost) || 0;
-      const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
-      const pnl = (cur - cost) * qty;
-      const rate = qty * cost > 0 ? (pnl / (qty * cost)) * 100 : 0;
-      const stopLoss = h.stopLoss ? Number(h.stopLoss) : null;
-      const takeProfit = h.takeProfit ? Number(h.takeProfit) : null;
-      const profile = getProfile(h.client);
-
-      let msg = `【${h.stockName}｜${h.symbol}】\n`;
-      if (rate >= 12) msg += `短线趋势偏强，获利区间较好。`;
-      else if (rate >= 3) msg += `仍属健康震荡，中期向上概率偏大。`;
-      else if (rate > -6) msg += `围绕成本来回震荡，方向暂未走出来。`;
-      else if (rate > -15) msg += `出现明显回撤，趋势偏弱，情绪略谨慎。`;
-      else msg += `处于深度回撤区间，短期反弹难度较大，需格外谨慎。`;
-
-      msg += ` 当前走势的关键在：①板块整体情绪是否配合，②能否放量突破关键价位，③主力/机构资金是否持续回流。`;
-
-      if (rate >= 12) msg += ` 建议以分批落袋为主，适当降低仓位，既保住利润又保留部分仓位跟随趋势。`;
-      else if (rate >= 3) msg += ` 可继续持有，重点观察放量突破前高的力度，不宜追高加仓，必要时高位减一部分锁定收益。`;
-      else if (rate > -6) msg += ` 暂不建议频繁操作，等出现放量突破或跌破关键支撑后再决定是顺势加仓还是果断减仓。`;
-      else if (rate > -15) msg += ` 建议先适度减仓，把整体仓位压下来，等待情绪修复或放量企稳后再考虑重新布局。`;
-      else msg += ` 建议以风险控制为先，利用反弹分批退出，把资金转向确定性更高、流动性更好的标的。`;
-
-      if (takeProfit && cur >= takeProfit) msg += ` 目前价格已处在或接近预设止盈区间，可按原计划分批兑现利润。`;
-      if (stopLoss && cur <= stopLoss) msg += ` 已接近或跌破止损线，建议优先考虑执行止损纪律，避免亏损进一步扩大。`;
-
-      if (rate <= 0) msg += ` 在趋势尚未重新走强前，不建议补仓，避免越补越深。`;
-      else msg += ` 如后续回踩支撑且成交量缩量，价格企稳后可以小仓位低吸补一点，但不宜大幅加码。`;
-
-      msg += ` 后续重点看是否“放量突破而不是放量滞涨”，突破可以顺势多看一段，若放量不上涨则应以落袋和减仓为主。`;
-
-      if (profile) {
-        const parts = [];
-        if (profile.stockAge) parts.push(`股龄约 ${profile.stockAge}`);
-        if (profile.style) parts.push(`操作风格偏「${profile.style}」`);
-        if (profile.preference) parts.push(`偏好 ${profile.preference}`);
-        if (parts.length) msg += `\n\n🔎 结合客户画像：${parts.join("，")}。后续沟通时可根据他的节奏和偏好，把重心放在“仓位控制 + 主线机会”上。`;
-        if (profile.family) msg += ` 家庭情况：${profile.family}，适合强调“尽量用闲钱投资、把已到手盈利落实到口袋”，控制回撤，避免给生活资金带来压力。`;
-      }
-
-      if (rate >= 8) msg += ` 当前整体节奏把握得不错，接下来主要是控制回撤，把账面盈利尽量转成已实现收益。`;
-      else if (rate >= -5) msg += ` 目前属于正常波动范围，关键在于耐心等待方向，不急于做过多动作。`;
-      else msg += ` 现在最重要的是稳住仓位和情绪，把风险控制在自己能接受的范围内，比盲目“解套”更重要。`;
-
-      let short = "";
-      if (rate >= 8) short = `现在这笔仓位盈利不错，建议您分批锁定一部分收益，剩余仓位我们再顺势看一看即可。`;
-      else if (rate >= 0) short = `目前整体处于正常震荡，先观察是否能放量突破，等方向更清晰后我们再一起调整。`;
-      else if (rate > -10) short = `这笔仓位有一定回撤，建议先把仓位适当降一下，等情绪和走势稳定后，我们再考虑下一步。`;
-      else short = `目前跌幅偏大，后面反弹我们会分批往外腾一部分仓位，尽量把损失控制住，再换到更有把握的机会。`;
-
-      msg += `\n\n📌 给客户的发送话术：\n${short}`;
-      return msg;
-    }
-
-    function generateClientAdvice(clientName, list) {
-      let totalCost = 0, totalValue = 0;
-      list.forEach(h => {
+      holdings.forEach(h => {
         const qty = Number(h.quantity) || 0;
         const cost = Number(h.cost) || 0;
         const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
         totalCost += qty * cost;
         totalValue += qty * cur;
       });
+
       const pnl = totalValue - totalCost;
       const rate = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
-      const profile = getProfile(clientName);
 
-      let msg = `【${clientName} · 持仓整体点评】\n`;
-      if (rate >= 10) msg += `整体盈利表现不错，节奏和选股方向都基本站得住。`;
-      else if (rate >= 0) msg += `整体处于小幅盈亏震荡阶段，仓位风险可控，但结构还有优化空间。`;
-      else if (rate > -10) msg += `组合出现一定回撤，但整体仍在可管理区间，主要问题在持仓结构和节奏。`;
-      else msg += `目前组合回撤偏大，需要先把风险降下来，再考虑后续机会。`;
+      sumCostEl.textContent = "₩ " + formatNumber(totalCost);
+      sumValueEl.textContent = "₩ " + formatNumber(totalValue);
 
-      const sorted = [...list].map(h => {
-        const qty = Number(h.quantity) || 0;
-        const cost = Number(h.cost) || 0;
-        const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
-        return { ...h, value: qty * cur };
-      }).sort((a, b) => b.value - a.value);
-
-      if (sorted.length) {
-        const top = sorted[0];
-        const weight = totalValue > 0 ? (top.value / totalValue) * 100 : 0;
-        msg += ` 目前权重最高的是 ${top.stockName}（${top.symbol}），约占组合市值的 ${weight.toFixed(1)}%，它的走势会对整体净值影响比较大，需要重点盯一下成交量和板块情绪。`;
-      }
-
-      if (rate >= 8) msg += ` 后续建议把涨幅大、波动大的标的适当减仓，锁定一部分盈利，同时把资金向确定性更高、基本面更清晰的主线集中。`;
-      else if (rate >= 0) msg += ` 建议减少边缘题材和成交量偏弱的个股仓位，把仓位更多放在流动性好、趋势明确的核心品种上。`;
-      else msg += ` 建议先清理亏损较重、逻辑不再清晰或流动性较差的持仓，把整体仓位降下来，让组合先处在一个自己舒服的风险水平。`;
-
-      msg += ` 后市关键仍在于：大盘和主流板块的情绪能否企稳、成交量能否放大，以及资金是否继续向您持有的主线方向集中。`;
-
-      if (profile) {
-        const parts = [];
-        if (profile.stockAge) parts.push(`股龄约 ${profile.stockAge}`);
-        if (profile.style) parts.push(`偏好「${profile.style}」节奏`);
-        if (profile.preference) parts.push(`更关注 ${profile.preference}`);
-        if (parts.length) msg += `\n\n🔎 结合客户背景：${parts.join("，")}。整体调仓时可以把仓位节奏控制在他能舒服持有的区间，避免追涨杀跌。`;
-        if (profile.family) msg += ` 家庭方面：${profile.family}，适合把组合定位为“稳中有进”，在有盈利时多做分批落袋，把回撤控制在他心理可承受范围内。`;
-      }
-
-      if (rate >= 6) msg += ` 整体来说这段时间的节奏是不错的，现在主要是边走边落袋，尽量别把到手的收益再吐回去。`;
-      else if (rate >= -5) msg += ` 目前属于正常波动范围，通过一点点调仓换股把结构调顺，后面机会还是有的。`;
-      else msg += ` 调整阶段很正常，关键是先稳住净值和心态，后面有更好的时机我们再慢慢把损失抢回来。`;
-
-      let short = "";
-      if (rate >= 6) short = `整体组合现在盈利还不错，接下来我们会边走边锁定收益，尽量把赚到的先装进口袋里。`;
-      else if (rate >= 0) short = `目前整体在正常震荡区间，我们会帮您把弱势仓位慢慢换掉，把资金集中到更有把握的主线上。`;
-      else short = `现在组合有一定回撤，接下来我们会优先把风险高、没什么把握的仓位降下来，等节奏稳住后再去找更好的机会。`;
-
-      msg += `\n\n📌 给客户的发送话术：\n${short}`;
-      return msg;
-    }
-
-    function renderSummary() {
-      summaryContainer.innerHTML = "";
-      const groups = groupByClient(holdings);
-      const clients = Object.keys(groups).sort();
-      if (!clients.length) {
-        summaryContainer.innerHTML =
-          '<div class="summary-item"><div class="summary-client" style="font-size:12px;color:#6b7280;">暂无持仓记录</div></div>';
-        return;
-      }
-
-      clients.forEach(clientName => {
-        const list = groups[clientName];
-        let totalCost = 0;
-        let totalValue = 0;
-        list.forEach(h => {
-          const qty = Number(h.quantity) || 0;
-          const cost = Number(h.cost) || 0;
-          const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
-          totalCost += qty * cost;
-          totalValue += qty * cur;
-        });
-        const pnl = totalValue - totalCost;
-        const rate = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
-
-        const profile = getProfile(clientName);
-        const basicInfoParts = [];
-        if (profile && profile.gender) basicInfoParts.push(profile.gender);
-        if (profile && profile.stockAge) basicInfoParts.push(`股龄 ${profile.stockAge}`);
-        if (profile && profile.age) basicInfoParts.push(`${profile.age}岁`);
-        const basicInfoText = basicInfoParts.join(" · ");
-
-        // 只要该客户有任何一只推荐股，卡片就高亮
-        const hasRecommend = list.some(h => h.isRecommend);
-
-        const card = document.createElement("div");
-        card.className = "summary-item" + (hasRecommend ? " follow-card" : "");
-
-        const rateClass = pnl > 0 ? "positive" : pnl < 0 ? "negative" : "";
-        const pnlClass = pnl > 0 ? "summary-value positive" :
-                         pnl < 0 ? "summary-value negative" : "summary-value";
-
-        card.innerHTML = `
-          <div class="summary-header">
-            <div class="summary-client">${clientName}</div>
-            <div class="summary-rate ${rateClass}">${formatPercent(rate)}</div>
-          </div>
-          ${basicInfoText ? `
-          <div class="summary-line">
-            <span class="summary-label">基本信息</span>
-            <span>${basicInfoText}</span>
-          </div>` : ""}
-          <div class="summary-line">
-            <span class="summary-label">总投入成本</span>
-            <span>₩ ${formatNumber(totalCost)}</span>
-          </div>
-          <div class="summary-line">
-            <span class="summary-label">当前市值</span>
-            <span>₩ ${formatNumber(totalValue)}</span>
-          </div>
-          <div class="summary-line">
-            <span class="summary-label">总盈亏</span>
-            <span class="${pnlClass}">₩ ${formatNumber(pnl)}</span>
-          </div>
-          <div class="summary-line" style="margin-top:4px; justify-content:flex-end; gap:6px;">
-            <button type="button" class="btn-ghost btn-sm profile-detail-btn">📇 详细档案</button>
-            <button type="button" class="btn-ai ai-client-btn">AI解析建议</button>
-          </div>
-        `;
-
-        card.querySelector(".ai-client-btn").addEventListener("click", () => {
-          const text = generateClientAdvice(clientName, list);
-          openAiModal(`${clientName} · 客户整体持仓解析`, text);
-        });
-        card.querySelector(".profile-detail-btn").addEventListener("click", () => {
-          openProfileModal(clientName);
-        });
-
-        summaryContainer.appendChild(card);
-      });
+      sumPnlEl.textContent = `₩ ${formatNumber(pnl)}（${formatPercent(rate)}）`;
+      sumPnlEl.classList.remove("positive","negative");
+      if (pnl > 0) sumPnlEl.classList.add("positive");
+      else if (pnl < 0) sumPnlEl.classList.add("negative");
     }
 
     function renderTable() {
       tableBody.innerHTML = "";
-      if (!holdings.length) {
+
+      // 根据筛选关键字过滤：按股票名称 or 代码
+      let filtered = holdings;
+      if (stockFilterKeyword) {
+        filtered = holdings.filter(h => {
+          const name = (h.stockName || "").toLowerCase();
+          const code = (h.code || "").toLowerCase();
+          return (
+            name.includes(stockFilterKeyword) ||
+            code.includes(stockFilterKeyword)
+          );
+        });
+      }
+
+      if (!filtered.length) {
         emptyTip.style.display = "block";
+        emptyTip.textContent = stockFilterKeyword
+          ? `未找到包含「${stockFilterKeyword}」的持仓记录。`
+          : "还没有录入任何持仓记录，请在左侧填写客户与股票信息后点击“保存持仓”。";
         return;
       }
       emptyTip.style.display = "none";
 
-      const groups = groupByClient(holdings);
+      const groups = groupByClient(filtered);
       const clients = Object.keys(groups).sort();
 
       clients.forEach(clientName => {
         const list = groups[clientName];
-        let clientCost = 0, clientValue = 0;
+
+        let clientCost = 0;
+        let clientValue = 0;
         list.forEach(h => {
           const qty = Number(h.quantity) || 0;
           const cost = Number(h.cost) || 0;
@@ -1088,15 +673,14 @@
           const rate = qty * cost > 0 ? (pnl / (qty * cost)) * 100 : 0;
 
           const tr = document.createElement("tr");
-/* 推荐股整行蓝色 */
-if (h.isRecommend) {
-  tr.classList.add("recommend-row");
-}
 
           if (h.currentPrice != null) {
             const cp = Number(h.currentPrice);
-            if (h.stopLoss && cp <= Number(h.stopLoss)) tr.style.background = "#fee2e2";
-            else if (h.takeProfit && cp >= Number(h.takeProfit)) tr.style.background = "#dcfce7";
+            if (h.stopLoss && cp <= Number(h.stopLoss)) {
+              tr.style.background = "#fee2e2";
+            } else if (h.takeProfit && cp >= Number(h.takeProfit)) {
+              tr.style.background = "#dcfce7";
+            }
           }
 
           const tdClient = document.createElement("td");
@@ -1105,17 +689,19 @@ if (h.isRecommend) {
 
           const tdStock = document.createElement("td");
           tdStock.className = "t-left";
-          const stockSpan = document.createElement("span");
-          if (h.isRecommend) {
-            stockSpan.className = "stock-recommend-cell";
-            stockSpan.textContent = h.stockName;
+          if (h.code) {
+            const link = document.createElement("a");
+            link.href = `https://finance.naver.com/item/sise.nhn?code=${h.code}`;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = h.stockName || "-";
+            tdStock.appendChild(link);
           } else {
-            stockSpan.textContent = h.stockName;
+            tdStock.textContent = h.stockName;
           }
-          tdStock.appendChild(stockSpan);
 
-          const tdSymbol = document.createElement("td");
-          tdSymbol.textContent = h.symbol;
+          const tdCode = document.createElement("td");
+          tdCode.textContent = h.code || "-";
 
           const tdQty = document.createElement("td");
           tdQty.textContent = formatNumber(qty);
@@ -1137,12 +723,14 @@ if (h.isRecommend) {
 
           const tdPnl = document.createElement("td");
           tdPnl.textContent = formatNumber(pnl);
-          tdPnl.style.color = pnl > 0 ? "#16a34a" : pnl < 0 ? "#dc2626" : "#111827";
+          tdPnl.style.color = pnl > 0 ? "#16a34a" : pnl < 0 ? "#b91c1c" : "#111827";
           tdPnl.style.fontWeight = "600";
 
           const tdRate = document.createElement("td");
           const pill = document.createElement("span");
-          pill.className = "pill " + (rate > 0 ? "pill-gain" : rate < 0 ? "pill-loss" : "pill-neutral");
+          pill.className =
+            "pill " +
+            (rate > 0 ? "pill-gain" : rate < 0 ? "pill-loss" : "pill-neutral");
           pill.textContent = formatPercent(rate);
           tdRate.appendChild(pill);
 
@@ -1151,21 +739,24 @@ if (h.isRecommend) {
           const actionsDiv = document.createElement("div");
           actionsDiv.className = "row-actions";
 
-          const aiBtn = document.createElement("button");
-          aiBtn.type = "button";
-          aiBtn.className = "btn-ai";
-          aiBtn.textContent = "AI解析";
-          aiBtn.onclick = () => {
-            const text = generateHoldingAdvice(h);
-            openAiModal(`${h.client} · ${h.stockName}（${h.symbol}）`, text);
-          };
-
           const oneRefreshBtn = document.createElement("button");
           oneRefreshBtn.type = "button";
           oneRefreshBtn.className = "btn btn-ghost btn-sm";
           oneRefreshBtn.textContent = "🔄";
           oneRefreshBtn.title = "刷新该股票行情";
-          oneRefreshBtn.onclick = () => refreshPrices([h.symbol]);
+          oneRefreshBtn.onclick = () => refreshPrices([h.code]);
+
+          const aiBtn = document.createElement("button");
+          aiBtn.type = "button";
+          aiBtn.className = "btn btn-secondary btn-sm";
+          aiBtn.textContent = "AI解析";
+          aiBtn.onclick = () => openAiModal(h);
+
+          const sellBtn = document.createElement("button");
+          sellBtn.type = "button";
+          sellBtn.className = "btn btn-ghost btn-sm";
+          sellBtn.textContent = "卖出";
+          sellBtn.onclick = () => openSellModal(h);
 
           const editBtn = document.createElement("button");
           editBtn.type = "button";
@@ -1179,15 +770,16 @@ if (h.isRecommend) {
           delBtn.textContent = "删除";
           delBtn.onclick = () => deleteHolding(h.id);
 
-          actionsDiv.appendChild(aiBtn);
           actionsDiv.appendChild(oneRefreshBtn);
+          actionsDiv.appendChild(aiBtn);
           actionsDiv.appendChild(editBtn);
+          actionsDiv.appendChild(sellBtn);
           actionsDiv.appendChild(delBtn);
           tdActions.appendChild(actionsDiv);
 
           tr.appendChild(tdClient);
           tr.appendChild(tdStock);
-          tr.appendChild(tdSymbol);
+          tr.appendChild(tdCode);
           tr.appendChild(tdQty);
           tr.appendChild(tdCost);
           tr.appendChild(tdSL);
@@ -1212,7 +804,6 @@ if (h.isRecommend) {
       editIdInput.value = "";
       submitLabel.textContent = "保存持仓";
       form.reset();
-      isRecommendInput.value = "否";
     }
 
     function startEdit(id) {
@@ -1221,8 +812,7 @@ if (h.isRecommend) {
       editIdInput.value = h.id;
       clientInput.value = h.client;
       stockNameInput.value = h.stockName;
-      symbolInput.value = h.symbol;
-      isRecommendInput.value = h.isRecommend ? "是" : "否";
+      codeInput.value = h.code;
       quantityInput.value = h.quantity;
       costInput.value = h.cost;
       stopLossInput.value = h.stopLoss ?? "";
@@ -1237,18 +827,17 @@ if (h.isRecommend) {
       resetForm();
     }
 
-    form.addEventListener("submit", e => {
+    form.addEventListener("submit", (e) => {
       e.preventDefault();
       const client = clientInput.value.trim();
       const stockName = stockNameInput.value.trim();
-      const symbol = symbolInput.value.trim();
+      const code = codeInput.value.trim();
       const quantity = Number(quantityInput.value);
       const cost = Number(costInput.value);
-      const isRecommend = isRecommendInput.value === "是";
       const stopLoss = stopLossInput.value ? Number(stopLossInput.value) : null;
       const takeProfit = takeProfitInput.value ? Number(takeProfitInput.value) : null;
 
-      if (!client || !stockName || !symbol || !quantity || !cost) {
+      if (!client || !stockName || !code || !quantity || !cost) {
         alert("请完整填写必填项。");
         return;
       }
@@ -1259,14 +848,8 @@ if (h.isRecommend) {
         if (idx >= 0) {
           holdings[idx] = {
             ...holdings[idx],
-            client,
-            stockName,
-            symbol,
-            quantity,
-            cost,
-            stopLoss,
-            takeProfit,
-            isRecommend
+            client, stockName, code,
+            quantity, cost, stopLoss, takeProfit
           };
         }
       } else {
@@ -1274,12 +857,11 @@ if (h.isRecommend) {
           id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
           client,
           stockName,
-          symbol,
+          code,
           quantity,
           cost,
           stopLoss,
           takeProfit,
-          isRecommend,
           currentPrice: null,
           updatedAt: null
         });
@@ -1288,7 +870,9 @@ if (h.isRecommend) {
       resetForm();
     });
 
-    resetBtn.addEventListener("click", resetForm);
+    resetBtn.addEventListener("click", () => {
+      resetForm();
+    });
 
     clearAllBtn.addEventListener("click", () => {
       if (!confirm("确定清空本机所有持仓记录吗？")) return;
@@ -1297,6 +881,7 @@ if (h.isRecommend) {
       resetForm();
     });
 
+    // === 自动刷新相关 ===
     function setAutoRefresh(on) {
       if (autoTimer) {
         clearInterval(autoTimer);
@@ -1312,7 +897,9 @@ if (h.isRecommend) {
 
     autoToggle.addEventListener("change", () => {
       setAutoRefresh(autoToggle.checked);
-      if (autoToggle.checked && holdings.length) refreshPrices();
+      if (autoToggle.checked && holdings.length) {
+        refreshPrices();
+      }
     });
 
     intervalSelect.addEventListener("change", () => {
@@ -1323,42 +910,57 @@ if (h.isRecommend) {
       refreshPrices();
     });
 
+    // 股票筛选输入
+    stockFilterInput.addEventListener("input", () => {
+      stockFilterKeyword = stockFilterInput.value.trim().toLowerCase();
+      renderTable();
+    });
+
+    // === 核心：刷新行情 ===
     async function refreshPrices(symbolsOverride) {
-      if (!holdings.length && !symbolsOverride) return;
-
-      let symbols;
-      if (symbolsOverride && symbolsOverride.length) {
-        symbols = Array.from(new Set(symbolsOverride));
-      } else {
-        symbols = Array.from(new Set(holdings.map(h => h.symbol)));
-      }
-
       try {
+        if (!holdings.length && !symbolsOverride) return;
+
+        let symbols;
+        if (symbolsOverride && symbolsOverride.length) {
+          symbols = Array.from(new Set(symbolsOverride.filter(Boolean)));
+        } else {
+          symbols = Array.from(
+            new Set(holdings.map(h => h.code).filter(Boolean))
+          );
+        }
+        if (!symbols.length) return;
+
         const res = await fetch("/api/prices", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ symbols })
         });
+
         if (!res.ok) {
-          console.error("行情刷新失败:", await res.text());
+          console.error("行情接口错误:", await res.text());
           return;
         }
-        const data = await res.json();
+
+        const data = await res.json(); // { "005930":{ok:true,price:xxx}, ... }
         const now = new Date().toISOString();
 
         holdings.forEach(h => {
-          const info = data[h.symbol] || data[h.symbol.toUpperCase()];
+          const info = data[h.code];
           if (info && info.ok) {
             h.currentPrice = Number(info.price);
             h.updatedAt = now;
           }
         });
+
         saveHoldings();
+        console.log("📌 行情刷新完成");
       } catch (e) {
         console.error("刷新行情异常:", e);
       }
     }
 
+    // === 导出收益日报（CSV） ===
     exportBtn.addEventListener("click", () => {
       if (!holdings.length) {
         alert("当前没有任何持仓记录可导出。");
@@ -1366,8 +968,18 @@ if (h.isRecommend) {
       }
       const rows = [];
       rows.push([
-        "客户","股票","是否推荐股","代码","数量","成本价","现价","市值","盈亏",
-        "收益率(%)","止损","止盈","更新时间"
+        "客户",
+        "股票",
+        "代码",
+        "数量",
+        "成本价",
+        "现价",
+        "市值",
+        "盈亏",
+        "收益率(%)",
+        "止损",
+        "止盈",
+        "更新时间"
       ]);
 
       holdings.forEach(h => {
@@ -1381,8 +993,7 @@ if (h.isRecommend) {
         rows.push([
           h.client,
           h.stockName,
-          h.isRecommend ? "是" : "否",
-          h.symbol,
+          h.code,
           qty,
           cost,
           cur,
@@ -1410,7 +1021,17 @@ if (h.isRecommend) {
         });
         const pnl = valSum - costSum;
         const rate = costSum > 0 ? (pnl / costSum) * 100 : 0;
-        rows.push([name,"","","","","",valSum,pnl,rate.toFixed(2)]);
+        rows.push([
+          name,
+          "",
+          "",
+          "",
+          "",
+          "",
+          valSum,
+          pnl,
+          rate.toFixed(2)
+        ]);
       });
 
       const csv = rows
@@ -1432,15 +1053,70 @@ if (h.isRecommend) {
       URL.revokeObjectURL(url);
     });
 
+    // === AI 解析弹窗（本地规则生成一段话） ===
+    function openAiModal(h) {
+      const qty = Number(h.quantity) || 0;
+      const cost = Number(h.cost) || 0;
+      const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
+      const value = qty * cur;
+      const pnl = value - qty * cost;
+      const rate = qty * cost > 0 ? (pnl / (qty * cost)) * 100 : 0;
+
+      let tone = "";
+      if (rate > 20) tone = "收益区间已经比较可观，可以考虑分批锁定利润，避免情绪化追高。";
+      else if (rate > 5) tone = "整体节奏还可以，短期注意量能变化，突破无量要适当收缩仓位。";
+      else if (rate > -5) tone = "目前盈亏都不大，先把仓位当成“观察票”，重点盯住支撑位和成交量。";
+      else if (rate > -15) tone = "回撤幅度不算小了，下方支撑一旦跌破要果断执行止损，不要再拖延。";
+      else tone = "亏损区间已经偏大了，建议先把仓位拆成几份，按反弹节奏分批减掉，控制整体风险。";
+
+      const text =
+        `【${h.client || "客户"} · ${h.stockName || ""}】\n` +
+        `当前仓位约 ${qty.toLocaleString("ko-KR")} 股，成本价 ₩${formatNumber(cost)}，` +
+        `最新价约 ₩${formatNumber(cur)}，浮动盈亏约 ₩${formatNumber(pnl)}（${formatPercent(rate)}）。\n\n` +
+        `走势上优先关注：前期平台支撑、5日/20日均线以及最近放量位置，如果后续放量上冲但实体收得很短，要防范主力高位减仓。\n` +
+        `止盈止损上建议：止损价可以参考你在系统里填写的价位，若未填写，可先把“最近明显支撑位下方 2~3%”当作硬止损线；止盈则分两步执行，` +
+        `第一目标位在前高附近，第二目标位看放量突破后的跟踪空间。\n\n` +
+        tone + ` 整体上节奏宁可慢一点，也尽量做到“先谈好止盈止损，再决定是否加仓或继续持有”。`;
+
+      aiModalBody.textContent = text;
+      aiModalBackdrop.style.display = "flex";
+    }
+
+    function closeAiModal() {
+      aiModalBackdrop.style.display = "none";
+    }
+
+    // === 卖出弹窗（本地模拟，不真正删除持仓） ===
+    function openSellModal(h) {
+      const qty = Number(h.quantity) || 0;
+      const cost = Number(h.cost) || 0;
+      const cur = h.currentPrice != null ? Number(h.currentPrice) : cost;
+      const value = qty * cur;
+      const pnl = value - qty * cost;
+      const rate = qty * cost > 0 ? (pnl / (qty * cost)) * 100 : 0;
+
+      const text =
+        `【模拟卖出总结】\n` +
+        `客户：${h.client || "-"}\n` +
+        `标的：${h.stockName || ""}（${h.code || ""}）\n` +
+        `数量：${qty.toLocaleString("ko-KR")} 股\n` +
+        `买入成本：₩${formatNumber(cost)}\n` +
+        `假设卖出价：₩${formatNumber(cur)}（当前价）\n\n` +
+        `投入成本合计：₩${formatNumber(qty * cost)}\n` +
+        `卖出金额合计：₩${formatNumber(value)}\n` +
+        `本次盈亏：₩${formatNumber(pnl)}（${formatPercent(rate)}）\n\n` +
+        `提示：这里只是帮助你快速给客户汇总结果，并没有真正从系统里删除持仓记录，如需清仓，请在确认后手动调整。`;
+
+      sellModalBody.textContent = text;
+      sellModalBackdrop.style.display = "flex";
+    }
+
+    function closeSellModal() {
+      sellModalBackdrop.style.display = "none";
+    }
+
+    // === 初始化 ===
     loadHoldings();
-    loadProfiles();
-
-    /* 兼容旧数据：没有 isRecommend 字段时默认 false */
-    holdings = holdings.map(h => ({
-      isRecommend: false,
-      ...h
-    }));
-
     renderAll();
   </script>
 </body>
